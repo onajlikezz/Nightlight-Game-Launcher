@@ -1,0 +1,15 @@
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\bin\Debug\Nightlight Launcher.exe.config
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\bin\Debug\Nightlight Launcher.exe
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\bin\Debug\Nightlight Launcher.pdb
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight Launcher.csproj.AssemblyReference.cache
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight_Launcher.Main.resources
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight_Launcher.Form2.resources
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight_Launcher.Properties.Resources.resources
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight Launcher.csproj.GenerateResource.cache
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight Launcher.csproj.CoreCompileInputs.cache
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight Launcher.exe
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight Launcher.pdb
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\bin\Debug\Nightlight Launcher.exe.manifest
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\bin\Debug\Nightlight Launcher.application
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight Launcher.exe.manifest
+C:\Users\OnajLikezz\source\repos\Nightlight Launcher\Nightlight Launcher\obj\Debug\Nightlight Launcher.application
