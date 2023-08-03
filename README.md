@@ -14,7 +14,7 @@
 
 ## SUPPORT
 IF YOU HAVE ANY QUESTIONS [CLICK HERE](https://discord.gg/nightliight) TO ENTER DSCORD SERVER
-OR ADD ME ON DISCORD: onajlikezz#1111
+OR ADD ME ON DISCORD: onajlikezz
 
 <!--🐍📈SNAKEGRAPH / 🌐WEBSITE: https://github.com/Platane/snk -->
 <img src="https://raw.githubusercontent.com/trinib/trinib/snake/github-contribution-grid-snake-dark.svg" width="100%">
