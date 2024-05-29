@@ -13,7 +13,7 @@
 - {x} [Support](#SUPPORT)
 
 ## SUPPORT
-IF YOU HAVE ANY QUESTIONS [CLICK HERE](https://discord.gg/nightliight) TO ENTER DSCORD SERVER
+IF YOU HAVE ANY QUESTIONS [CLICK HERE](https://discord.gg/pBFaCQQVBV) TO ENTER DSCORD SERVER
 OR ADD ME ON DISCORD: onajlikezz
 
 <!--🐍📈SNAKEGRAPH / 🌐WEBSITE: https://github.com/Platane/snk -->
