@@ -7,6 +7,12 @@
   <img alt="Discord" src="https://img.shields.io/discord/1196052745979957278?logo=discord&style=flat-square">
 </p>
 
+## NOTE!
+- I decided to make the last version (NLGL V4) [open source](https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/SourceCode.rar) because many people were saying it contains viruses.  
+- I lost the original source code, so I decompiled the executable using [dnSpy](https://github.com/dnSpy/dnSpy). If you are still skeptical, you can do the same and verify it yourself.  
+- The program only downloads cracked game files and places them into the game folder.  
+- I tested everything, but I cannot guarantee that it does not contain malware.  
+
 ## More About the Program
 - {x} [Download Last Release](https://github.com/onajlikezz/Nightlight-Game-Launcher/releases)
 - {x} [YouTube Tutorial](https://www.youtube.com/watch?v=WnMs0cusbwk)
