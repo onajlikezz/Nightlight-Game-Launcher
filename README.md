@@ -4,7 +4,7 @@
   <img src="SCRS/NLV4.png"        /n>
   <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/onajlikezz/Nightlight-Game-Launcher/total?logo=GitHub">
   <img alt="YouTube Channel Subscribers" src="https://img.shields.io/youtube/channel/subscribers/UCPGq5aI894K7cr0xvu0vJZQ?logo=YouTube&logoColor=red&style=flat-square">
-  <img alt="Discord" src="https://img.shields.io/discord/1196052745979957278?logo=discord&style=flat-square">
+  <img alt="Discord" src="https://img.shields.io/discord/1496614237022458040?logo=discord&style=flat-square">
 </p>
 
 ## NOTE!
@@ -19,7 +19,7 @@
 - {x} [Support](#SUPPORT)
 
 ## SUPPORT
-If you have any questions [click here](https://discord.gg/pBFaCQQVBV) to join discord server
+If you have any questions [click here](https://discord.gg/yXeWQ6arcq) to join discord server
 or add me on telegram: onjlkz
 
 ## SUPPORT ME
