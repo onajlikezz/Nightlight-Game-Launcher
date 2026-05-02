@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nightlight Game Launcher</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nl: {
+              bg: '#0d0a0e', surface: '#1a111c', card: '#221a25', cardHover: '#2d2231',
+              pink: '#e84393', pinkLight: '#fd79a8', pinkDark: '#b83280',
+              pinkMuted: 'rgba(232,67,147,0.15)', pinkGlow: 'rgba(232,67,147,0.3)',
+              text: '#f0e6f0', textMuted: '#8a7590', border: 'rgba(232,67,147,0.12)', borderActive: 'rgba(232,67,147,0.4)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+    html,body { overflow:hidden; height:100%; background:#0d0a0e; color:#f0e6f0; user-select:none; }
+    ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:rgba(232,67,147,0.3); border-radius:3px; }
+    .title-bar { -webkit-app-region:drag; } .title-bar button { -webkit-app-region:no-drag; }
+    @keyframes fadeSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes pulseGlow { 0%,100%{box-shadow:0 0 15px rgba(232,67,147,0.2)} 50%{box-shadow:0 0 30px rgba(232,67,147,0.4)} }
+    @keyframes floatIn { from{opacity:0;transform:translateY(30px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes progressPulse { 0%,100%{box-shadow:0 0 8px rgba(232,67,147,0.4)} 50%{box-shadow:0 0 20px rgba(232,67,147,0.8),0 0 40px rgba(232,67,147,0.3)} }
+    .animate-fade-up { animation:fadeSlideUp 0.4s ease-out forwards; }
+    .animate-float-in { animation:floatIn 0.5s ease-out forwards; }
+    .pulse-glow { animation:pulseGlow 3s ease-in-out infinite; }
+    .progress-pulse { animation:progressPulse 2s ease-in-out infinite; }
+    .game-card { transition:all 0.3s cubic-bezier(0.4,0,0.2,1); position:relative; overflow:hidden; }
+    .game-card::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(232,67,147,0.1),transparent 60%); opacity:0; transition:opacity 0.3s; z-index:1; border-radius:inherit; }
+    .game-card:hover::before { opacity:1; }
+    .game-card:hover { transform:translateY(-6px) scale(1.02); box-shadow:0 12px 40px rgba(232,67,147,0.25),0 0 0 1px rgba(232,67,147,0.3); }
+    .nav-item { transition:all 0.2s; position:relative; }
+    .nav-item::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:0; background:#e84393; border-radius:0 3px 3px 0; transition:height 0.2s; }
+    .nav-item:hover::before,.nav-item.active::before { height:60%; }
+    .nav-item.active { background:rgba(232,67,147,0.1); color:#fd79a8; }
+    .nav-item:hover { background:rgba(232,67,147,0.07); color:#fd79a8; }
+    .win-btn { transition:all 0.15s; } .win-btn:hover { background:rgba(232,67,147,0.2); } .win-btn-close:hover { background:#e84393; }
+    .tab-content { display:none; } .tab-content.active { display:block; animation:fadeSlideUp 0.35s ease-out; }
+    #loginOverlay { transition:opacity 0.4s; } .fade-out { opacity:0; pointer-events:none; }
+    .modal-overlay { transition:opacity 0.3s; } .modal-overlay.hidden { display:none; } .modal-overlay.show { display:flex; }
+    select option { background:#1a111c; color:#f0e6f0; }
+  </style>
+</head>
+<body class="bg-nl-bg text-nl-text">
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay" class="fixed inset-0 z-[200] flex items-center justify-center" style="background:#0d0a0e;">
+  <div class="w-full max-w-sm animate-float-in">
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-nl-pinkMuted flex items-center justify-center pulse-glow">
+        <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" alt="Nightlight" class="w-14 h-14 object-contain">
+      </div>
+      <h1 class="text-2xl font-bold mb-1">Nightlight</h1>
+      <p class="text-sm text-nl-textMuted">Enter your access key to continue</p>
+    </div>
+    <div class="bg-nl-surface border border-nl-border rounded-2xl p-6">
+      <div class="mb-4">
+        <label class="text-xs font-medium text-nl-textMuted uppercase tracking-wider mb-2 block">Access Key</label>
+        <input type="password" id="accessKeyInput" placeholder="Enter your key..." class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-3 text-sm text-nl-text focus:outline-none focus:border-nl-pink/50" onkeydown="if(event.key==='Enter')attemptLogin()">
+      </div>
+      <p id="loginError" class="text-xs text-red-400 mb-3 hidden">Invalid access key.</p>
+      <button id="loginBtn" class="w-full py-2.5 bg-nl-pink text-white text-sm font-semibold rounded-lg hover:bg-nl-pinkDark transition-colors" onclick="attemptLogin()">
+        Login
+      </button>
+
+      <!-- 🆕 Unlock a key link -->
+      <p class="text-center mt-4">
+        <a href="#" onclick="openSocialLink('https://link-center.net/501526/wjWenJLFz3uh')" class="text-xs text-nl-pinkLight hover:text-nl-pink underline underline-offset-2 transition-colors">
+          Unlock a key
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- TITLE BAR -->
+<div class="title-bar fixed top-0 left-0 right-0 h-9 bg-nl-surface/90 backdrop-blur-xl flex items-center justify-between z-[210] border-b border-nl-border">
+  <div class="flex items-center gap-3 pl-4">
+    <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" class="w-5 h-5">
+    <span class="text-xs font-semibold text-nl-pinkLight tracking-wider uppercase">Nightlight</span>
+  </div>
+  <div class="flex items-center h-full">
+    <button class="win-btn h-full px-4 flex items-center justify-center text-white/80 hover:text-white" onclick="minimizeApp()"><i data-lucide="minus" class="w-3.5 h-3.5"></i></button>
+    <button class="win-btn h-full px-4 flex items-center justify-center text-white/80 hover:text-white" onclick="maximizeApp()"><i data-lucide="square" class="w-3 h-3"></i></button>
+    <button class="win-btn win-btn-close h-full px-4 flex items-center justify-center text-white/80 hover:text-white" onclick="closeApp()"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="flex h-full pt-9">
+  <aside class="w-60 bg-nl-surface/70 backdrop-blur-xl border-r border-nl-border flex flex-col shrink-0">
+    <div class="p-5 border-b border-nl-border">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-nl-pinkMuted flex items-center justify-center pulse-glow">
+          <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" class="w-7 h-7">
+        </div>
+        <div>
+          <h1 class="text-sm font-bold">Nightlight</h1>
+          <p class="text-[10px] text-nl-pink font-medium tracking-wider uppercase">Game Launcher</p>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 py-4 px-2 space-y-1">
+        <p class="text-[10px] font-semibold text-nl-textMuted uppercase tracking-widest px-3 mb-3">Main</p>
+        <button class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="accounts" onclick="switchTab('accounts')">
+            <i data-lucide="gamepad-2" class="w-4 h-4"></i> Accounts
+        </button>
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="bypass" onclick="switchTab('bypass')">
+            <i data-lucide="shield" class="w-4 h-4"></i> Bypass
+        </button>
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="checkForUpdates()">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Check for Updates
+        </button>
+
+        <!-- ── NEW SOCIALS SECTION ────────────────────────────── -->
+        <p class="text-[10px] font-semibold text-nl-textMuted uppercase tracking-widest px-3 mt-6 mb-3">Socials</p>
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://www.youtube.com/@onajjlikezz')">
+            <i data-lucide="circle-play" class="w-4 h-4"></i> YouTube
+        </button>
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://discord.gg/yXeWQ6arcq')">
+            <i data-lucide="message-circle" class="w-4 h-4"></i> Discord
+        </button>
+    </nav>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto">
+    <!-- ACCOUNTS TAB -->
+    <div class="tab-content active" id="tab-accounts">
+      <div class="px-8 pb-8 mt-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-2"><div class="w-1 h-5 bg-nl-pink rounded-full"></div><h3 class="text-lg font-bold">Available Accounts</h3></div>
+          <button onclick="refreshAccounts()" class="px-3 py-1.5 bg-nl-card border border-nl-border rounded-lg text-xs hover:border-nl-borderActive flex items-center gap-2"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh</button>
+        </div>
+        <div id="accounts-container" class="grid grid-cols-2 lg:grid-cols-4 gap-4"></div>
+      </div>
+    </div>
+
+    <!-- BYPASS TAB -->
+    <div class="tab-content" id="tab-bypass">
+      <div class="px-8 py-8">
+        <div class="flex justify-between items-center mb-6">
+          <div><h2 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="shield" class="text-nl-pink"></i> Bypass Panel</h2><p class="text-xs text-nl-textMuted mt-1">Inject bypass files into supported games</p></div>
+          <button onclick="toggleCustomPathModal()" class="flex items-center gap-2 px-4 py-2 bg-nl-card border border-nl-border rounded-xl hover:border-nl-pink transition-all group"><i data-lucide="plus" class="w-4 h-4 text-nl-pink group-hover:scale-110"></i><span class="text-sm font-medium">Custom Path</span></button>
+        </div>
+        <div id="bypass-progress-container" class="hidden mb-6 p-5 bg-nl-card border border-nl-pink/20 rounded-2xl">
+          <div class="flex items-center justify-between mb-3"><p id="bypass-progress-text" class="text-xs text-nl-pinkLight font-mono tracking-wide">Initializing...</p><span id="bypass-progress-percent" class="text-xs font-bold text-nl-pink">0%</span></div>
+          <div class="w-full h-2 bg-nl-bg rounded-full overflow-hidden"><div id="bypass-progress-bar" class="h-full bg-gradient-to-r from-nl-pinkDark via-nl-pink to-nl-pinkLight rounded-full progress-pulse transition-all duration-500 ease-out" style="width:0%"></div></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="bypass-games-container"></div>
+      </div>
+    </div>
+
+    <!-- GAME DETAILS TAB -->
+    <div class="tab-content" id="tab-game-details">
+      <div class="px-8 py-8">
+        <button onclick="switchTab('accounts')" class="flex items-center gap-2 text-nl-textMuted hover:text-nl-pink mb-6 transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Accounts
+        </button>
+        <div class="flex flex-col lg:flex-row gap-8 animate-fade-up">
+          <div class="w-full lg:w-1/2">
+            <img id="detail-banner" src="" class="w-full rounded-2xl border border-nl-border shadow-2xl">
+          </div>
+          <div class="w-full lg:w-1/2">
+            <h2 id="detail-title" class="text-3xl font-extrabold mb-2"></h2>
+            <p id="detail-appid" class="text-nl-pink font-mono text-sm mb-4"></p>
+            <p id="detail-description" class="text-nl-textMuted leading-relaxed mb-6"></p>
+            <div class="grid grid-cols-2 gap-4 mb-8">
+              <div class="bg-nl-card p-4 rounded-xl border border-nl-border">
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Release Date</span>
+                <span id="detail-date" class="font-semibold text-sm"></span>
+              </div>
+              <div class="bg-nl-card p-4 rounded-xl border border-nl-border">
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">System Status</span>
+                <span class="font-semibold text-sm text-green-400">Optimal</span>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <button onclick="showAccountSelection()" class="flex-1 py-4 bg-nl-pink text-white rounded-xl font-bold hover:scale-[1.02] transition-transform shadow-lg shadow-nl-pink/20">
+                Show Accounts
+              </button>
+              <button id="detail-bypass-btn" onclick="bypassFromDetail()" class="flex-1 py-4 bg-nl-card border border-nl-border rounded-xl font-bold hover:border-nl-pink transition-all flex items-center justify-center">
+                Inject Bypass
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCOUNT SELECTION TAB -->
+    <div class="tab-content" id="tab-select-account">
+      <div class="px-8 py-8">
+        <button onclick="goBackToDetails()" class="flex items-center gap-2 text-nl-textMuted hover:text-nl-pink mb-6">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Game Details
+        </button>
+        <h3 class="text-2xl font-bold mb-6">Select Account</h3>
+        <div id="account-selection-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- CUSTOM PATH MODAL -->
+<div id="custom-path-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center modal-overlay">
+  <div class="bg-nl-surface border border-nl-border p-6 rounded-2xl w-[420px] animate-float-in">
+    <h3 class="text-lg font-bold mb-4">Add Custom Game Path</h3>
+    <input type="text" id="path-input" oninput="checkGameExistence(this.value)" placeholder="C:\Games\GTAV" class="w-full bg-nl-bg border border-nl-border p-3 rounded-xl mb-4 text-sm focus:border-nl-pink">
+    <div class="flex items-center gap-2 mb-4"><input type="checkbox" id="check-exist-toggle" checked class="accent-nl-pink"><label class="text-xs text-nl-textMuted">Check if game exists there</label></div>
+    <select id="custom-game-select" class="w-full bg-nl-bg border border-nl-border p-3 rounded-xl mb-6 text-sm">
+      <option value="Not Detected">Not Detected</option>
+      <option value="Grand Theft Auto V">Grand Theft Auto V</option>
+      <option value="Grand Theft Auto IV">Grand Theft Auto IV</option>
+      <option value="Red Dead Redemption 2">Red Dead Redemption 2</option>
+      <option value="Red Dead Redemption">Red Dead Redemption</option>
+    </select>
+    <div class="flex gap-3">
+      <button onclick="toggleCustomPathModal()" class="flex-1 py-2.5 bg-nl-card rounded-lg">Cancel</button>
+      <button onclick="applyCustomPath()" class="flex-1 py-2.5 bg-nl-pink text-white rounded-lg font-bold">Save Path</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="fixed bottom-6 right-6 z-[100] space-y-3" id="toastContainer"></div>
+</body>
+</html>
