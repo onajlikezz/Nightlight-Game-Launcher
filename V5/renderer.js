@@ -304,46 +304,109 @@ function renderBypassCards() {
   lucide.createIcons();
 }
 
-async function revertBypass(gameName, gamePath) {
-  if (!confirm(`Are you sure you want to revert the bypass for ${gameName}?`)) return;
-  showToast("Restoring original files...", "info");
-  const res = await ipcRenderer.invoke('revert-bypass', { gameName, gamePath });
-  if (res.success) {
-    showToast("Original files restored!", "success");
-    renderBypassCards();
-  } else {
-    showToast(`Error: ${res.error}`, "error");
-  }
+function downloadFile(url, destPath) {
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(destPath);
+    https.get(url, (response) => {
+      if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+        https.get(response.headers.location, (res) => {
+          res.pipe(file);
+          file.on('finish', () => { file.close(); resolve(); });
+          file.on('error', reject);
+        }).on('error', reject);
+        return;
+      }
+      response.pipe(file);
+      file.on('finish', () => { file.close(); resolve(); });
+      file.on('error', reject);
+    }).on('error', reject);
+  });
 }
 
 async function injectBypass(gameName, gamePath) {
+  const files = launcherData.BYPASS_DATA?.[gameName];
+  if (!files || files.length === 0) {
+    showToast('No bypass files defined.', 'error');
+    return;
+  }
+  if (!gamePath || !fs.existsSync(gamePath)) {
+    showToast('Game path not found.', 'error');
+    return;
+  }
+
   const progressContainer = document.getElementById('bypass-progress-container');
   const bar = document.getElementById('bypass-progress-bar');
   const text = document.getElementById('bypass-progress-text');
   const percentEl = document.getElementById('bypass-progress-percent');
   switchTab('bypass');
   progressContainer.classList.remove('hidden');
-  bar.style.width = '0%'; text.textContent = `Preparing ${gameName} bypass...`; percentEl.textContent = '0%';
-  const handler = (event, data) => {
-    bar.style.width = data.percent + '%';
-    text.textContent = data.message;
-    percentEl.textContent = data.percent + '%';
-  };
-  ipcRenderer.on('bypass-progress', handler);
-  try {
-    const res = await ipcRenderer.invoke('start-bypass', { gameName, gamePath });
-    if (res.success) {
-      showToast(`${gameName} bypass applied! Original files saved.`, 'success');
-    } else {
-      showToast(`Bypass failed: ${res.error}`, 'error');
+  bar.style.width = '0%';
+  text.textContent = `Preparing ${gameName} bypass...`;
+  percentEl.textContent = '0%';
+
+  const appId = launcherData.STEAM_APP_IDS?.[gameName] || 'unknown';
+  const backupDir = path.join(os.homedir(), 'AppData', 'Local', 'nightlight launcher', 'saves', String(appId), 'original');
+  if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
+
+  const totalFiles = files.length;
+  for (let i = 0; i < totalFiles; i++) {
+    const url = files[i];
+    const fileName = path.basename(url);
+    const destPath = path.join(gamePath, fileName);
+    const backupPath = path.join(backupDir, fileName);
+    const percent = Math.round(((i + 1) / totalFiles) * 100);
+    text.textContent = `Backing up & replacing ${fileName} (${i + 1}/${totalFiles})`;
+    bar.style.width = percent + '%';
+    percentEl.textContent = percent + '%';
+
+    // Backup existing file
+    if (fs.existsSync(destPath)) {
+      try { fs.renameSync(destPath, backupPath); } catch(e) {
+        fs.copyFileSync(destPath, backupPath);
+        fs.unlinkSync(destPath);
+      }
     }
-  } catch(e) {
-    showToast(`Error: ${e.message}`, 'error');
-  } finally {
-    ipcRenderer.removeListener('bypass-progress', handler);
-    setTimeout(() => progressContainer.classList.add('hidden'), 1500);
-    renderBypassCards();   // ⚡ re-render to show REVERT button / status
+    try {
+      await downloadFile(url, destPath);
+    } catch(err) {
+      // Restore original on failure
+      if (fs.existsSync(backupPath)) try { fs.copyFileSync(backupPath, destPath); } catch(_) {}
+      showToast(`Failed to download ${fileName}: ${err.message}`, 'error');
+      progressContainer.classList.add('hidden');
+      return;
+    }
   }
+  fs.writeFileSync(path.join(gamePath, 'bypass_applied.txt'), new Date().toISOString());
+  showToast(`${gameName} bypass applied! Original files saved.`, 'success');
+  progressContainer.classList.add('hidden');
+  renderBypassCards();
+}
+
+async function revertBypass(gameName, gamePath) {
+  if (!confirm(`Revert bypass for ${gameName}?`)) return;
+  const files = launcherData.BYPASS_DATA?.[gameName];
+  if (!files || files.length === 0) {
+    showToast('No bypass files defined.', 'error');
+    return;
+  }
+  const appId = launcherData.STEAM_APP_IDS?.[gameName] || 'unknown';
+  const backupDir = path.join(os.homedir(), 'AppData', 'Local', 'nightlight launcher', 'saves', String(appId), 'original');
+  try {
+    if (!fs.existsSync(backupDir)) throw new Error('No backup files found.');
+    for (const url of files) {
+      const fileName = path.basename(url);
+      const gameFilePath = path.join(gamePath, fileName);
+      const backupFilePath = path.join(backupDir, fileName);
+      if (fs.existsSync(gameFilePath)) fs.unlinkSync(gameFilePath);
+      if (fs.existsSync(backupFilePath)) fs.copyFileSync(backupFilePath, gameFilePath);
+    }
+    const marker = path.join(gamePath, 'bypass_applied.txt');
+    if (fs.existsSync(marker)) fs.unlinkSync(marker);
+    showToast('Original files restored!', 'success');
+  } catch(e) {
+    showToast(`Revert failed: ${e.message}`, 'error');
+  }
+  renderBypassCards();
 }
 
 // ── Custom Path ──────────────────────────────────────────────────────
