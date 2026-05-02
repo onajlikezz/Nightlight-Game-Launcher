@@ -1,0 +1,49 @@
+{
+  "BYPASS_DATA": {
+    "Grand Theft Auto V": [
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/bink2w64.dll",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/launc.dll",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/orig_socialclub.dll",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/PlayGTAV.exe",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/socialclub.dll"
+    ],
+    "Red Dead Redemption 2": [
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR2Files/1911.dll",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR2Files/bink2w64.dll",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR2Files/Launcher.exe",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR2Files/RDR2.exe"
+    ],
+    "Red Dead Redemption": [
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR1Files/1911.dll",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR1Files/PlayRDR.exe",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR1Files/RDR.exe",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR1Files/steam_api64.dll"
+    ],
+    "Grand Theft Auto IV": [
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/binkw32.dll",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/GTAIV.exe",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/launc.dll",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/orig_socialclub.dll",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/PlayGTAIV.exe",
+      "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/socialclub.dll"
+    ]
+  },
+  "EXE_MAP": {
+    "Grand Theft Auto V": "PlayGTAV.exe",
+    "Red Dead Redemption 2": "RDR2.exe",
+    "Red Dead Redemption": "RDR.exe",
+    "Grand Theft Auto IV": "GTAIV.exe"
+  },
+  "STEAM_APP_IDS": {
+    "Grand Theft Auto V": 271590,
+    "Grand Theft Auto IV": 12210,
+    "Red Dead Redemption 2": 1174180,
+    "Red Dead Redemption": 2668510
+  },
+  "GAME_ID_MAP": {
+    "Grand Theft Auto V": 271590,
+    "Grand Theft Auto IV": 12210,
+    "Red Dead Redemption 2": 1174180,
+    "Red Dead Redemption": 2668510
+  }
+}
