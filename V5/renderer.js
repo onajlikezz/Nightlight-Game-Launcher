@@ -400,31 +400,17 @@ async function attemptLogin() {
   if (!input) return;
   btn.textContent = "Verifying...";
   try {
-    const response = await fetch('https://raw.githubusercontent.com/uxqc/9423odcx/refs/heads/main/34kfx.xs');
-    const text = await response.text();
-    const validKeys = text.split(/\r?\n/).map(k => k.trim()).filter(k => k);
-    if (validKeys.includes(input)) {
+    // ✅ SECURE: verification stays in main.js
+    const isValid = await ipcRenderer.invoke('verify-key', input);
+    if (isValid) {
       document.getElementById('loginOverlay').classList.add('fade-out');
       showToast('Login successful!', 'success');
-
-      // 1. Fetch Steam data for bypass games (Rockstar)
-      const bypassIds = Object.values(GAME_ID_MAP);
-      await fetchSteamDataForIds(bypassIds);
-
-      // 2. Fetch Discord accounts
+      // load data & scan as before ...
+      await fetchSteamDataForIds(Object.values(GAME_ID_MAP));
       await fetchDiscordAccounts();
-
-      // 3. Fetch Steam data for EVERY game found in Discord (e.g. Age of History 3)
       const discordIds = Object.keys(discordAccounts).map(Number);
       await fetchSteamDataForIds(discordIds);
-
-      // 4. Small extra wait to ensure all HTTP requests have finished (optional but safe)
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // 5. Now scan for installations – all names are available
       await scanForAllGames();
-
-      // 6. Render both tabs
       renderAccountsFromDiscord();
       renderBypassCards();
     } else {
