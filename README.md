@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="SCRS/NLV5.png" width="700">
+  <img src="SCRS/NLGLV5Final.png" width="700">
 </p>
 
 <p align="center">
