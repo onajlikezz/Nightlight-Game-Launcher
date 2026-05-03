@@ -19,12 +19,11 @@
 ## 🚀 What is Nightlight?
 Nightlight is a lightweight utility designed to help you manage and launch your games directly, bypassing heavy third-party launchers. 
 
-### 🌟 New in Version 5 (Coming Soon!)
+### 🌟 New in Version 5
 I'm currently working hard on **NLGL V5**. Here is what’s landing:
 *   **Account Manager:** Switch between accounts seamlessly and play your selected games directly on Steam.
 *   **Refined Bypasses:** Carrying over the proven methods from V4 with new expansions planned.
 *   **New UI:** A cleaner, faster experience.
-*   📺 [**Watch the V5 Sneak Peek here**](https://www.youtube.com/watch?v=nrryxJ4HjvU)
 
 ---
 
@@ -50,7 +49,7 @@ Need help or want to suggest a feature for V5?
 
 ### ☕ Support My Work
 If NLGL has helped you out, consider buying me a coffee to keep the development going:
-*   **PayPal:** [paypal.me/2vvq](https://paypal.me/2vvq)
+*   (Soon)
 
 ---
 
