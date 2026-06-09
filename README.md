@@ -1,5 +1,4 @@
 # 🌌 Nightlight Game Launcher (NLGL)
-# This project is discontinued.
 <p align="center">
   <strong>Streamline your library. Launch games without the bloat.</strong>
 </p>
