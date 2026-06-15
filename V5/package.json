@@ -1,0 +1,24 @@
+{
+  "name": "nightlight-launcher",
+  "version": "5.1.2",
+  "description": "This program is made to Bypass Games Launcher!",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "OnajLikezz",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.nightlight.launcher",
+    "productName": "Nightlight Launcher",
+    "win": {
+      "icon": "assets/icon.png",
+      "target": "nsis"
+    }
+  }
+}

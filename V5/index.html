@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nightlight Game Launcher</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nl: {
+              bg: '#0d0a0e', surface: '#1a111c', card: '#221a25', cardHover: '#2d2231',
+              pink: '#e84393', pinkLight: '#fd79a8', pinkDark: '#b83280',
+              pinkMuted: 'rgba(232,67,147,0.15)', pinkGlow: 'rgba(232,67,147,0.3)',
+              text: '#f0e6f0', textMuted: '#8a7590', border: 'rgba(232,67,147,0.12)', borderActive: 'rgba(232,67,147,0.4)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+    html,body { overflow:hidden; height:100%; background:#0d0a0e; color:#f0e6f0; user-select:none; }
+    ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:rgba(232,67,147,0.3); border-radius:3px; }
+    .title-bar { -webkit-app-region:drag; } .title-bar button { -webkit-app-region:no-drag; }
+    @keyframes fadeSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes pulseGlow { 0%,100%{box-shadow:0 0 15px rgba(232,67,147,0.2)} 50%{box-shadow:0 0 30px rgba(232,67,147,0.4)} }
+    @keyframes floatIn { from{opacity:0;transform:translateY(30px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes progressPulse { 0%,100%{box-shadow:0 0 8px rgba(232,67,147,0.4)} 50%{box-shadow:0 0 20px rgba(232,67,147,0.8),0 0 40px rgba(232,67,147,0.3)} }
+    .animate-fade-up { animation:fadeSlideUp 0.4s ease-out forwards; }
+    .animate-float-in { animation:floatIn 0.5s ease-out forwards; }
+    .pulse-glow { animation:pulseGlow 3s ease-in-out infinite; }
+    .progress-pulse { animation:progressPulse 2s ease-in-out infinite; }
+    .game-card { transition:all 0.3s cubic-bezier(0.4,0,0.2,1); position:relative; overflow:hidden; }
+    .game-card::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(232,67,147,0.1),transparent 60%); opacity:0; transition:opacity 0.3s; z-index:1; border-radius:inherit; }
+    .game-card:hover::before { opacity:1; }
+    .game-card:hover { transform:translateY(-6px) scale(1.02); box-shadow:0 12px 40px rgba(232,67,147,0.25),0 0 0 1px rgba(232,67,147,0.3); }
+    .nav-item { transition:all 0.2s; position:relative; }
+    .nav-item::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:0; background:#e84393; border-radius:0 3px 3px 0; transition:height 0.2s; }
+    .nav-item:hover::before,.nav-item.active::before { height:60%; }
+    .nav-item.active { background:rgba(232,67,147,0.1); color:#fd79a8; }
+    .nav-item:hover { background:rgba(232,67,147,0.07); color:#fd79a8; }
+    .win-btn { transition:all 0.15s; } .win-btn:hover { background:rgba(232,67,147,0.2); } .win-btn-close:hover { background:#e84393; }
+    .tab-content { display:none; } .tab-content.active { display:block; animation:fadeSlideUp 0.35s ease-out; }
+    #loginOverlay { transition:opacity 0.4s; } .fade-out { opacity:0; pointer-events:none; }
+    .modal-overlay { transition:opacity 0.3s; } .modal-overlay.hidden { display:none; } .modal-overlay.show { display:flex; }
+    select option { background:#1a111c; color:#f0e6f0; }
+    .bypass-card { transition:all 0.25s; }
+    .bypass-card:hover { transform:translateY(-3px); box-shadow:0 8px 25px rgba(232,67,147,0.2); }
+    .achievement-card { transition:all 0.2s; }
+    .achievement-card.locked { opacity:0.7; filter:grayscale(0.4); }
+  </style>
+</head>
+<body class="bg-nl-bg text-nl-text">
+
+<div id="loginOverlay" class="fixed inset-0 z-[200] flex items-center justify-center" style="background:#0d0a0e;">
+  <div class="w-full max-w-sm animate-float-in">
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-nl-pinkMuted flex items-center justify-center pulse-glow">
+        <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" alt="Nightlight" class="w-14 h-14 object-contain">
+      </div>
+      <h1 class="text-2xl font-bold mb-1">Nightlight</h1>
+      <p class="text-sm text-nl-textMuted" id="loginMessage">Enter your access key to continue</p>
+    </div>
+    <div class="bg-nl-surface border border-nl-border rounded-2xl p-6">
+      <div class="mb-4">
+        <label class="text-xs font-medium text-nl-textMuted uppercase tracking-wider mb-2 block">Access Key</label>
+        <input type="password" id="accessKeyInput" placeholder="Enter your key..." class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-3 text-sm text-nl-text focus:outline-none focus:border-nl-pink/50" onkeydown="if(event.key==='Enter')attemptLogin()">
+      </div>
+      <p id="loginError" class="text-xs text-red-400 mb-3 hidden">Invalid access key.</p>
+      <button id="loginBtn" class="w-full py-2.5 bg-nl-pink text-white text-sm font-semibold rounded-lg hover:bg-nl-pinkDark transition-colors" onclick="attemptLogin()">
+        Login
+      </button>
+      <p class="text-center mt-4">
+          <a href="#" id="unlockKeyLink" class="text-xs text-nl-pinkLight hover:text-nl-pink underline underline-offset-2 transition-colors">
+              Unlock a key
+          </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="title-bar fixed top-0 left-0 right-0 h-9 bg-nl-surface backdrop-blur-xl flex items-center justify-between z-[215] border-b border-nl-border shadow-lg shadow-black/30" ondblclick="maximizeApp()">
+  <div class="flex items-center gap-3 pl-4">
+    <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" class="w-5 h-5">
+    <span class="text-xs font-semibold text-nl-pinkLight tracking-wider uppercase">Nightlight</span>
+  </div>
+  <div class="flex items-center h-full">
+    <button class="win-btn h-full px-4 flex items-center justify-center text-white/80 hover:text-white" onclick="minimizeApp()"><i data-lucide="minus" class="w-3.5 h-3.5"></i></button>
+    <button class="win-btn h-full px-4 flex items-center justify-center text-white/80 hover:text-white" onclick="maximizeApp()"><i data-lucide="square" class="w-3 h-3"></i></button>
+    <button class="win-btn win-btn-close h-full px-4 flex items-center justify-center text-white/80 hover:text-white" onclick="closeApp()"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+  </div>
+</div>
+
+<div class="flex h-full pt-9">
+  <aside class="w-60 bg-nl-surface/70 backdrop-blur-xl border-r border-nl-border flex flex-col shrink-0">
+    <div class="p-5 border-b border-nl-border">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-nl-pinkMuted flex items-center justify-center pulse-glow">
+          <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" class="w-7 h-7">
+        </div>
+        <div>
+          <h1 class="text-sm font-bold">Nightlight</h1>
+          <p class="text-[10px] text-nl-pink font-medium tracking-wider uppercase">Game Launcher</p>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 py-4 px-2 space-y-1">
+        <p class="text-[10px] font-semibold text-nl-textMuted uppercase tracking-widest px-3 mb-3">Main</p>
+        <button class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="accounts" onclick="switchTab('accounts')">
+            <i data-lucide="gamepad-2" class="w-4 h-4"></i> Accounts
+        </button>
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="bypass" onclick="switchTab('bypass')">
+            <i data-lucide="shield" class="w-4 h-4"></i> Bypass
+        </button>
+        <!-- ACHIEVEMENTS BUTTON (replaces 'Check for Updates') -->
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="achievements" onclick="switchTab('achievements')">
+            <i data-lucide="trophy" class="w-4 h-4"></i> Achievements
+        </button>
+
+        <p class="text-[10px] font-semibold text-nl-textMuted uppercase tracking-widest px-3 mt-6 mb-3">Socials</p>
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://www.youtube.com/@onajjlikezz')">
+            <i data-lucide="circle-play" class="w-4 h-4"></i> YouTube
+        </button>
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://discord.gg/yXeWQ6arcq')">
+            <i data-lucide="message-circle" class="w-4 h-4"></i> Discord
+        </button>
+        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://github.com/onajlikezz/')">
+            <i data-lucide="folders" class="w-4 h-4"></i> GitHub
+        </button>
+    </nav>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto">
+    <!-- ACCOUNTS TAB -->
+    <div class="tab-content active" id="tab-accounts">
+      <div class="px-8 pb-8 mt-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-2"><div class="w-1 h-5 bg-nl-pink rounded-full"></div><h3 class="text-lg font-bold">Available Accounts</h3></div>
+          <button onclick="refreshAccounts()" class="px-3 py-1.5 bg-nl-card border border-nl-border rounded-lg text-xs hover:border-nl-borderActive flex items-center gap-2"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh</button>
+        </div>
+        <div class="mb-4">
+          <input type="text" id="accounts-search-input" placeholder="Search games..." class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-2.5 text-sm text-nl-text placeholder-nl-textMuted focus:outline-none focus:border-nl-pink/50" oninput="filterAccounts()">
+        </div>
+        <div id="accounts-container" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <p class="col-span-full text-center text-nl-textMuted py-8">Loading accounts...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BYPASS LIST TAB -->
+    <div class="tab-content" id="tab-bypass">
+      <div class="px-8 py-8">
+        <div class="flex justify-between items-center mb-6">
+          <div><h2 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="shield" class="text-nl-pink"></i> Bypass Panel</h2><p class="text-xs text-nl-textMuted mt-1">Click a game to manage bypass</p></div>
+          <button onclick="toggleCustomPathModal()" class="flex items-center gap-2 px-4 py-2 bg-nl-card border border-nl-border rounded-xl hover:border-nl-pink transition-all group"><i data-lucide="plus" class="w-4 h-4 text-nl-pink group-hover:scale-110"></i><span class="text-sm font-medium">Custom Path</span></button>
+        </div>
+        <div class="mb-4">
+          <input type="text" id="bypass-search-input" placeholder="Search games..." class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-2.5 text-sm text-nl-text placeholder-nl-textMuted focus:outline-none focus:border-nl-pink/50" oninput="filterBypass()">
+        </div>
+        <div id="bypass-games-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <p class="col-span-full text-center text-nl-textMuted py-8">Loading bypass games...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS TAB (GTA V only) -->
+    <div class="tab-content" id="tab-achievements">
+      <div class="px-8 py-8">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="trophy" class="text-nl-pink"></i> Grand Theft Auto V Achievements</h2>
+            <p class="text-xs text-nl-textMuted mt-1">Unlocked achievements are tracked from your mod's output folder</p>
+          </div>
+          <button onclick="refreshAchievements()" class="px-3 py-1.5 bg-nl-card border border-nl-border rounded-lg text-xs hover:border-nl-borderActive flex items-center gap-2"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh</button>
+        </div>
+        <div class="mb-4">
+          <input type="text" id="achievements-search-input" placeholder="Search achievements..." class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-2.5 text-sm text-nl-text placeholder-nl-textMuted focus:outline-none focus:border-nl-pink/50" oninput="filterAchievements()">
+        </div>
+        <div id="achievements-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <p class="col-span-full text-center text-nl-textMuted py-8">Loading achievements...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BYPASS DETAIL TAB -->
+    <div class="tab-content" id="tab-bypass-detail">
+      <div class="px-8 py-8">
+        <button onclick="goBackToBypassList()" class="flex items-center gap-2 text-nl-textMuted hover:text-nl-pink mb-6">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Bypass List
+        </button>
+        <div class="animate-fade-up">
+          <div class="flex flex-col lg:flex-row gap-8 pb-24">
+            <div class="w-full lg:w-1/3">
+              <img id="bypass-detail-banner" src="" class="w-full rounded-2xl border border-nl-border shadow-2xl">
+            </div>
+            <div class="w-full lg:w-2/3">
+              <h2 id="bypass-detail-title" class="text-3xl font-bold mb-2"></h2>
+              <p id="bypass-detail-status" class="text-sm uppercase tracking-wider mb-4"></p>
+              <div id="bypass-detail-actions" class="flex flex-wrap gap-3 mb-6"></div>
+              <div id="bypass-detail-progress" class="hidden p-5 bg-nl-card border border-nl-pink/20 rounded-2xl mb-6">
+                <div class="flex items-center justify-between mb-3">
+                  <p id="bypass-progress-text" class="text-xs text-nl-pinkLight font-mono tracking-wide">Initializing...</p>
+                  <span id="bypass-progress-percent" class="text-xs font-bold text-nl-pink">0%</span>
+                </div>
+                <div class="w-full h-2 bg-nl-bg rounded-full overflow-hidden">
+                  <div id="bypass-progress-bar" class="h-full bg-gradient-to-r from-nl-pinkDark via-nl-pink to-nl-pinkLight rounded-full progress-pulse transition-all duration-500 ease-out" style="width:0%"></div>
+                </div>
+              </div>
+              <div id="custom-path-section" class="hidden">
+                <button onclick="deleteCustomPath(currentBypassGameName)" class="px-4 py-2 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl text-sm font-semibold hover:bg-red-500 hover:text-white transition-all flex items-center gap-2">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i> Remove Custom Path
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME DETAILS TAB (Accounts) -->
+    <div class="tab-content" id="tab-game-details">
+      <div class="px-8 py-8 relative" style="min-height: calc(100vh - 36px);">
+        <button onclick="switchTab('accounts')" class="flex items-center gap-2 text-nl-textMuted hover:text-nl-pink mb-6 transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Accounts
+        </button>
+        <div class="flex flex-col lg:flex-row gap-8 animate-fade-up pb-24">
+          <div class="w-full lg:w-1/2 flex flex-col gap-6">
+            <img id="detail-banner" src="" class="w-full rounded-2xl border border-nl-border shadow-2xl">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Release Date</span>
+                <span id="detail-date" class="font-semibold text-sm"></span>
+              </div>
+              <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Metacritic</span>
+                <span id="detail-metacritic" class="font-semibold text-sm"></span>
+              </div>
+              <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Developer</span>
+                <span id="detail-developer" class="font-semibold text-sm"></span>
+              </div>
+              <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Publisher</span>
+                <span id="detail-publisher" class="font-semibold text-sm"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="w-full lg:w-1/2">
+            <h2 id="detail-title" class="text-3xl font-extrabold mb-2"></h2>
+            <p id="detail-appid" class="text-nl-pink font-mono text-sm mb-4"></p>
+            <p id="detail-description" class="text-nl-textMuted leading-relaxed mb-6"></p>
+
+            <div class="flex flex-wrap gap-2 mb-6" id="detail-categories-genres"></div>
+
+            <div class="mb-6">
+              <h4 class="text-sm font-semibold text-nl-pinkLight mb-3">System Requirements</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-nl-card p-4 rounded-xl border border-nl-border">
+                  <h5 class="text-xs font-semibold uppercase tracking-wider text-nl-textMuted mb-2">Minimum</h5>
+                  <div id="req-min-content" class="text-xs text-nl-text leading-relaxed max-h-40 overflow-y-auto"></div>
+                </div>
+                <div class="bg-nl-card p-4 rounded-xl border border-nl-border">
+                  <h5 class="text-xs font-semibold uppercase tracking-wider text-nl-textMuted mb-2">Recommended</h5>
+                  <div id="req-rec-content" class="text-xs text-nl-text leading-relaxed max-h-40 overflow-y-auto"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fixed bottom-0 left-60 right-0 bg-nl-surface/95 backdrop-blur-xl border-t border-nl-border p-4 flex gap-4 z-50">
+          <button onclick="showAccountSelection()" class="flex-1 py-4 bg-nl-pink text-white rounded-xl font-bold hover:scale-[1.02] transition-transform shadow-lg shadow-nl-pink/20">
+            Show Accounts
+          </button>
+          <button id="detail-bypass-btn" onclick="switchToBypassAndScroll()" class="flex-1 py-4 bg-nl-card border border-nl-border rounded-xl font-bold hover:border-nl-pink transition-all flex items-center justify-center">
+            Inject Bypass
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCOUNT SELECTION TAB -->
+    <div class="tab-content" id="tab-select-account">
+      <div class="px-8 py-8">
+        <button onclick="goBackToDetails()" class="flex items-center gap-2 text-nl-textMuted hover:text-nl-pink mb-6">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Game Details
+        </button>
+        <h3 class="text-2xl font-bold mb-6">Select Account</h3>
+        <div id="account-selection-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="custom-path-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center modal-overlay">
+  <div class="bg-nl-surface border border-nl-border p-6 rounded-2xl w-[420px] animate-float-in">
+    <h3 class="text-lg font-bold mb-4">Add Custom Game Path</h3>
+    <input type="text" id="path-input" oninput="checkGameExistence(this.value)" placeholder="C:\Games\GTAV" class="w-full bg-nl-bg border border-nl-border p-3 rounded-xl mb-4 text-sm focus:border-nl-pink">
+    <div class="flex items-center gap-2 mb-4"><input type="checkbox" id="check-exist-toggle" checked class="accent-nl-pink"><label class="text-xs text-nl-textMuted">Check if game exists there</label></div>
+    <select id="custom-game-select" class="w-full bg-nl-bg border border-nl-border p-3 rounded-xl mb-6 text-sm">
+      <option value="Not Detected">Not Detected</option>
+    </select>
+    <div class="flex gap-3">
+      <button onclick="toggleCustomPathModal()" class="flex-1 py-2.5 bg-nl-card rounded-lg">Cancel</button>
+      <button onclick="applyCustomPath()" class="flex-1 py-2.5 bg-nl-pink text-white rounded-lg font-bold">Save Path</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update Required Modal (auto‑shown when a new version is detected) -->
+<div id="update-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] hidden flex items-center justify-center modal-overlay">
+  <div class="bg-nl-surface border border-nl-pink p-6 rounded-2xl w-[480px] animate-float-in shadow-2xl">
+    <div class="flex items-center gap-3 mb-4">
+      <i data-lucide="alert-triangle" class="w-7 h-7 text-yellow-400"></i>
+      <h3 class="text-xl font-bold text-nl-pinkLight">Update Required</h3>
+    </div>
+    <p class="text-sm text-nl-text leading-relaxed mb-2">
+      In order to use Nightlight Launcher you need to update to the latest version.
+    </p>
+    <div class="bg-nl-card p-3 rounded-xl border border-nl-border my-4">
+      <p class="text-xs text-nl-textMuted">Your version: <span id="current-version-display" class="font-mono text-nl-pink"></span></p>
+      <p class="text-xs text-nl-textMuted">Latest version: <span id="latest-version-display" class="font-mono text-green-400"></span></p>
+    </div>
+    <p class="text-xs text-nl-textMuted mb-6">
+      Please download the new release from GitHub and install it to continue using the launcher.
+    </p>
+    <div class="flex gap-3">
+      <button id="update-now-btn" class="flex-1 py-2.5 bg-nl-pink text-white rounded-lg font-bold hover:bg-nl-pinkDark transition-colors flex items-center justify-center gap-2">
+        <i data-lucide="download" class="w-4 h-4"></i> Update Now
+      </button>
+      <button id="update-exit-btn" class="flex-1 py-2.5 bg-nl-card border border-nl-border rounded-lg font-bold hover:bg-red-500/20 hover:border-red-500 transition-colors">
+        Exit
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Bypass Warning Modal -->
+<div id="bypass-warning-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] hidden flex items-center justify-center modal-overlay">
+  <div class="bg-nl-surface border border-nl-border p-6 rounded-2xl w-[420px] animate-float-in">
+    <div class="flex items-center gap-3 mb-4">
+      <i data-lucide="alert-triangle" class="w-6 h-6 text-yellow-400"></i>
+      <h3 class="text-lg font-bold">Warning</h3>
+    </div>
+    <p class="text-sm text-nl-textMuted mb-6 leading-relaxed">
+      This bypass was reported to not working.<br>
+      You can download and try it but we can't guarantee that it will work.
+    </p>
+    <button onclick="closeBypassWarning()" class="w-full py-2.5 bg-nl-pink text-white rounded-lg font-bold hover:bg-nl-pinkDark transition-colors">
+      OK
+    </button>
+  </div>
+</div>
+<div class="fixed bottom-6 right-6 z-[100] space-y-3" id="toastContainer"></div>
+
+<script>
+const { ipcRenderer } = require('electron');
+const fs = require('fs');
+const path = require('path');
+
+document.querySelector('.title-bar').addEventListener('dblclick', (e) => {
+  if (!e.target.closest('button')) maximizeApp();
+});
+
+async function openSocialLink(url) {
+  await ipcRenderer.invoke('open-external-link', url);
+}
+
+const KEY_URL_TXT = 'https://raw.githubusercontent.com/onajlikezz/Nightlight-Game-Launcher/refs/heads/main/keyaccesslink.txt';
+let unlockKeyUrl
+
+async function fetchUnlockKeyUrl() {
+        const res = await fetch(KEY_URL_TXT);
+        if (res.ok) {
+            const text = (await res.text()).trim();
+            if (text) unlockKeyUrl = text;
+        }
+    document.getElementById('unlockKeyLink').onclick = () => openSocialLink(unlockKeyUrl);
+}
+
+// ---------- Semantic version comparison ----------
+function parseVersion(str) {
+  const match = str.match(/\d+(?:\.\d+)*/);
+  if (!match) return [0];
+  return match[0].split('.').map(Number);
+}
+
+function compareVersions(v1, v2) {
+  const parts1 = parseVersion(v1);
+  const parts2 = parseVersion(v2);
+  const maxLen = Math.max(parts1.length, parts2.length);
+  for (let i = 0; i < maxLen; i++) {
+    const num1 = i < parts1.length ? parts1[i] : 0;
+    const num2 = i < parts2.length ? parts2[i] : 0;
+    if (num1 !== num2) return num1 < num2 ? -1 : 1;
+  }
+  return 0;
+}
+
+const CURRENT_VERSION_NUMBER = "5.2.0";
+
+// Checks for updates and shows a blocking modal if a newer version exists.
+async function checkForUpdatesAndPrompt() {
+  const updateUrl = "https://api.github.com/repos/onajlikezz/Nightlight-Game-Launcher/releases/latest";
+  try {
+    const response = await fetch(updateUrl);
+    if (!response.ok) throw new Error("Failed to reach GitHub API");
+    const data = await response.json();
+    let latestTag = data.tag_name;
+    if (latestTag && (latestTag.startsWith('v') || latestTag.startsWith('V'))) {
+      latestTag = latestTag.slice(1);
+    }
+    if (!latestTag) throw new Error("No version tag");
+    const isNewer = compareVersions(latestTag, CURRENT_VERSION_NUMBER) > 0;
+    if (isNewer) {
+      const modal = document.getElementById('update-modal');
+      document.getElementById('current-version-display').textContent = CURRENT_VERSION_NUMBER;
+      document.getElementById('latest-version-display').textContent = latestTag;
+      modal.classList.remove('hidden');
+      modal.classList.add('show');
+      lucide.createIcons();
+
+      const updateBtn = document.getElementById('update-now-btn');
+      const exitBtn = document.getElementById('update-exit-btn');
+      const newUpdateBtn = updateBtn.cloneNode(true);
+      const newExitBtn = exitBtn.cloneNode(true);
+      updateBtn.parentNode.replaceChild(newUpdateBtn, updateBtn);
+      exitBtn.parentNode.replaceChild(newExitBtn, exitBtn);
+      newUpdateBtn.addEventListener('click', () => {
+        ipcRenderer.invoke('open-external-link', 'https://github.com/onajlikezz/Nightlight-Game-Launcher/releases');
+      });
+      newExitBtn.addEventListener('click', () => {
+        ipcRenderer.send('close-app');
+      });
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Update check failed:", error);
+    return false;
+  }
+}
+
+// ---------- ACHIEVEMENTS DATA ----------
+// Mirror of the AchievementWatcher mod's AllAchievements array (GTA V only)
+const GTA_ACHIEVEMENTS = [
+  // Launcher / Intro
+  { id: "ACH_NL_USER", title: "Nightlight User", description: "Welcome to GTA V via Nightlight Game Launcher!", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  // Custom Money Tiers
+  { id: "ACH_MONEY_100K", title: "Hustler", description: "Earn $100,000 in Los Santos.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_BANK_MAZE", hidden: false },
+  { id: "ACH_MONEY_500K", title: "Moving Up", description: "Earn $500,000 in Los Santos.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_BANK_MAZE", hidden: false },
+  { id: "ACH_MONEY_1M", title: "Millionaire", description: "Earn your first $1,000,000 in Los Santos.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_BANK_MAZE", hidden: false },
+  { id: "ACH_MONEY_5M", title: "High Roller", description: "Earn $5,000,000 in Los Santos.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_BANK_MAZE", hidden: false },
+  { id: "ACH_MONEY_10M", title: "Kingpin", description: "Earn $10,000,000 in Los Santos.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_BANK_MAZE", hidden: false },
+  // Custom First Person Tiers
+  { id: "ACH_FP_5M", title: "Testing the Waters", description: "Play in First Person for 5 minutes.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH_FP_10M", title: "Getting Immersed", description: "Play in First Person for 10 minutes.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH_FP_30M", title: "Seeing Through Their Eyes", description: "Play in First Person for 30 minutes.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH_FP_1H", title: "Hour of Immersion", description: "Play in First Person for 1 hour.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH_FP_5H", title: "Virtual Reality", description: "Play in First Person for 5 hours.", icon: "https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true", isSteam: false, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH51", title: "A New Perspective", description: "Play GTA V for 15 hours in first person mode.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/1451e338312b4560ee10299c4c1bee82acedfdae.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  // Standard GTA V
+  { id: "ACH00", title: "Welcome to Los Santos", description: "You repo'd a car and raced it through the heart of a sun-soaked metropolis.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/348a8015272416e2587965c493877b822fb2bcd1.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH10", title: "Solid Gold, Baby!", description: "Earn 70 Gold Medals on Missions and Strangers and Freaks.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/2eac4e774d1b6f0cbd46393be4ce008f4559688b.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH11", title: "Career Criminal", description: "Attain 100% Game Completion.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/1a0eef51e98dd1709a52d051bb22eadc8e881eb7.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH15", title: "From Beyond the Stars", description: "Collect and return all spaceship parts.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/261162b00823538d895dabf9ae5f90d7129fdb67.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH16", title: "A Mystery, Solved", description: "Solve the mystery of Leonora Johnson.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/ecab7eb6da462803fd6e85d40b78c6907fc76cda.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH17", title: "Waste Management", description: "Purchase the old dock and collect all nuclear waste.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/3898b2c3a2d1561fecf3f675179fc0135a45af5e.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH18", title: "Red Mist", description: "Complete all Rampages.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/81a8d4d47335b034b36878e347483985b183d4a6.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH19", title: "Show Off", description: "Complete all Stunt Jumps.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/60e66c0469fb410358c88980c5ceabf00c5aa223.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH24", title: "A Lot of Cheddar", description: "Spend a total of $200 million across all three characters.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/6a87dfec720e77e7b67ce8b9c34da38a99080c33.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH26", title: "Pimp My Sidearm", description: "Fully mod a weapon.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/1ae6d3bd27ba653fd047642bcc46815e8acc5434.jpg", isSteam: true, inGameIconDict: "CHAR_LS_CUSTOMS", hidden: false },
+  { id: "ACH28", title: "Los Santos Customs", description: "Fully mod a vehicle.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/319c366846d3317b08c0175bd71c2a947981e08c.jpg", isSteam: true, inGameIconDict: "CHAR_LS_CUSTOMS", hidden: false },
+  { id: "ACH29", title: "Close Shave", description: "Complete all Under the Bridge and Knife Flight challenges.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/586302c5c6efcc72fa661e57790e706b1acd0ac1.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false },
+  { id: "ACH50", title: "San Andreas Sightseer", description: "Explore all of Los Santos and Blaine County.", icon: "https://shared.fastly.steamstatic.com/community_assets/images/apps/271590/d1046370faa06ba5267bb9535155a26c4c907119.jpg", isSteam: true, inGameIconDict: "CHAR_SOCIAL_CLUB", hidden: false }
+];
+
+let unlockedAchievementIds = new Set();
+
+async function refreshAchievements() {
+  try {
+    const unlocked = await ipcRenderer.invoke('get-unlocked-achievements');
+    unlockedAchievementIds = new Set(unlocked);
+    renderAchievements();
+  } catch (err) {
+    console.error("Failed to load achievements:", err);
+    showToast("Could not load achievements", "error");
+  }
+}
+
+function renderAchievements() {
+  const container = document.getElementById('achievements-container');
+  if (!container) return;
+  
+  if (!GTA_ACHIEVEMENTS.length) {
+    container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">No achievement definitions found.</p>';
+    return;
+  }
+  
+  const searchTerm = document.getElementById('achievements-search-input')?.value.toLowerCase() || '';
+  
+  const filtered = GTA_ACHIEVEMENTS.filter(ach => 
+    ach.title.toLowerCase().includes(searchTerm) || 
+    ach.description.toLowerCase().includes(searchTerm)
+  );
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">No matching achievements.</p>';
+    return;
+  }
+  
+  container.innerHTML = filtered.map(ach => {
+    const isUnlocked = unlockedAchievementIds.has(ach.id);
+    const lockClass = isUnlocked ? '' : 'locked';
+    const badge = isUnlocked 
+      ? '<span class="absolute top-3 right-3 bg-green-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Unlocked</span>'
+      : '<span class="absolute top-3 right-3 bg-gray-700/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1"><i data-lucide="lock" class="w-3 h-3"></i> Locked</span>';
+    
+    return `
+      <div class="achievement-card ${lockClass} relative bg-nl-card border border-nl-border rounded-xl overflow-hidden hover:border-nl-pink transition-all">
+        ${badge}
+        <div class="flex flex-col items-center p-4 text-center">
+          <img src="${ach.icon}" class="w-16 h-16 object-contain rounded-full mb-3 bg-nl-surface p-1" onerror="this.src='https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true'">
+          <h4 class="text-sm font-bold text-nl-text mb-1">${ach.title}</h4>
+          <p class="text-[11px] text-nl-textMuted leading-relaxed">${ach.description}</p>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  lucide.createIcons();
+}
+
+function filterAchievements() {
+  renderAchievements();
+}
+
+let steamGameData = {};
+let gameStatuses = {};
+let discordAccounts = {};
+let bypassGames = [];
+let bypassAppIdMap = {};
+let bypassExeMap = {};
+let currentBypassGameName = null;
+
+async function fetchSteamDataForIds(ids) {
+  for (const id of ids) {
+    if (steamGameData[id]) continue;
+    try {
+      const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${id}`);
+      const json = await res.json();
+      if (json[id]?.success) steamGameData[id] = json[id].data;
+    } catch(e) { console.error('Steam fetch error', e); }
+  }
+}
+
+function checkLocalGame(folderName, exeName = null) {
+  const drives = 'CDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const commonSubPaths = [
+    'Program Files (x86)\\Steam\\steamapps\\common',
+    'SteamLibrary\\steamapps\\common',
+    'Steam\\steamapps\\common'
+  ];
+  for (const drive of drives) {
+    for (const subPath of commonSubPaths) {
+      const fullPath = `${drive}:\\${subPath}\\${folderName}`;
+      try {
+        if (fs.existsSync(fullPath)) {
+          if (exeName && !fs.existsSync(path.join(fullPath, exeName))) continue;
+          return { installed: true, path: fullPath, isCustom: false };
+        }
+      } catch(e) {}
+    }
+  }
+  return { installed: false, path: null };
+}
+
+async function scanForAllGames() {
+  gameStatuses = {};
+  for (const game of bypassGames) {
+    const name = game.name;
+    const folderName = game.folderName || name;
+    let status = checkLocalGame(folderName, game.exeName);
+    const customs = await ipcRenderer.invoke('get-custom-paths');
+    if (customs[name] && fs.existsSync(path.join(customs[name], game.exeName || ''))) {
+      status = { installed: true, path: customs[name], isCustom: true };
+    }
+    gameStatuses[name] = status;
+  }
+  for (const appIdStr of Object.keys(discordAccounts)) {
+    const appId = Number(appIdStr);
+    if (gameStatuses[appId]) continue;
+    const gameInfo = steamGameData[appId];
+    if (!gameInfo) continue;
+    const folderName = gameInfo.name;
+    let status = checkLocalGame(folderName);
+    const customs = await ipcRenderer.invoke('get-custom-paths');
+    if (customs[folderName] && fs.existsSync(customs[folderName])) {
+      status = { installed: true, path: customs[folderName], isCustom: true };
+    }
+    gameStatuses[folderName] = status;
+    gameStatuses[appId] = status;
+  }
+}
+
+async function fetchDiscordAccounts() {
+  try {
+    const result = await ipcRenderer.invoke('fetch-discord-accounts');
+    if (result.success) {
+      discordAccounts = result.accounts;
+      return true;
+    } else {
+      showToast(`Discord error: ${result.error}`, 'error');
+      return false;
+    }
+  } catch(e) {
+    showToast('Failed to fetch Discord accounts', 'error');
+    return false;
+  }
+}
+
+async function refreshAccounts() {
+  await fetchDiscordAccounts();
+  await scanForAllGames();
+  renderAccountsFromDiscord();
+  renderBypassCards();
+}
+
+function filterAccounts() {
+  const term = document.getElementById('accounts-search-input').value.toLowerCase();
+  const cards = document.querySelectorAll('#accounts-container > .game-card');
+  cards.forEach(card => {
+    const name = card.querySelector('h4').textContent.toLowerCase();
+    card.style.display = name.includes(term) ? '' : 'none';
+  });
+}
+
+function filterBypass() {
+  const term = document.getElementById('bypass-search-input').value.toLowerCase();
+  const cards = document.querySelectorAll('#bypass-games-container > .game-card');
+  cards.forEach(card => {
+    const name = card.querySelector('h4').textContent.toLowerCase();
+    card.style.display = name.includes(term) ? '' : 'none';
+  });
+}
+
+function renderAccountsFromDiscord() {
+  const container = document.getElementById('accounts-container');
+  const gameIds = Object.keys(discordAccounts).filter(id => discordAccounts[id].length > 0);
+  if (gameIds.length === 0) {
+    container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">No accounts found.</p>';
+    return;
+  }
+  container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">Loading accounts...</p>';
+  let idx = 0;
+  function addNext() {
+    if (idx >= gameIds.length) {
+      container.querySelector('.col-span-full')?.remove();
+      lucide.createIcons();
+      filterAccounts();
+      return;
+    }
+    const id = gameIds[idx];
+    if (!steamGameData[id]) {
+      fetchSteamDataForIds([id]).then(() => {
+        if (steamGameData[id]) appendCard(steamGameData[id]);
+        idx++;
+        setTimeout(addNext, 100);
+      });
+    } else {
+      appendCard(steamGameData[id]);
+      idx++;
+      setTimeout(addNext, 100);
+    }
+  }
+  function appendCard(game) {
+    const status = gameStatuses[game.steam_appid] || { installed: false };
+    const installed = status.installed;
+    const escapedName = game.name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const card = document.createElement('div');
+    card.className = 'game-card rounded-xl bg-nl-card border border-nl-border cursor-pointer';
+    card.setAttribute('onclick', `openGameDetail('${escapedName}')`);
+    card.innerHTML = `
+      <div class="relative aspect-[16/7.5] rounded-t-xl overflow-hidden">
+        <img src="${game.header_image}" alt="${game.name}" class="w-full h-full object-cover">
+      </div>
+      <div class="p-3">
+        <h4 class="text-sm font-semibold truncate mb-1.5">${game.name}</h4>
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 ${installed ? 'bg-green-500' : 'bg-nl-textMuted'} rounded-full"></span>
+          <span class="text-[10px] ${installed ? 'text-green-400' : 'text-nl-textMuted'} font-medium uppercase tracking-tighter">
+            ${installed ? 'Installed' : 'Not Detected'}
+          </span>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  }
+  addNext();
+}
+
+let currentDetailGame = null;
+function openGameDetail(gameName) {
+  const gameEntry = Object.entries(steamGameData).find(([id, data]) => data.name === gameName);
+  if (!gameEntry) return;
+  const game = gameEntry[1];
+  currentDetailGame = game;
+  document.getElementById('detail-title').textContent = game.name;
+  document.getElementById('detail-banner').src = game.header_image;
+  document.getElementById('detail-appid').textContent = `STEAM ID: ${game.steam_appid}`;
+  document.getElementById('detail-description').textContent = game.short_description || 'No description available.';
+  document.getElementById('detail-date').textContent = game.release_date?.date || 'TBA';
+  const mcScore = game.metacritic ? `${game.metacritic.score} (Meta)` : 'N/A';
+  document.getElementById('detail-metacritic').textContent = mcScore;
+  document.getElementById('detail-developer').textContent = game.developers?.join(', ') || 'Unknown';
+  document.getElementById('detail-publisher').textContent = game.publishers?.join(', ') || 'Unknown';
+  const badgesContainer = document.getElementById('detail-categories-genres');
+  let badgesHTML = '';
+  if (game.categories) {
+    game.categories.forEach(cat => {
+      badgesHTML += `<span class="inline-block px-2 py-1 text-[10px] font-medium rounded-full bg-nl-pinkMuted text-nl-pinkLight border border-nl-pink/20">${cat.description}</span>`;
+    });
+  }
+  if (game.genres) {
+    game.genres.forEach(gen => {
+      badgesHTML += `<span class="inline-block px-2 py-1 text-[10px] font-medium rounded-full bg-nl-card border border-nl-border text-nl-text">${gen.description}</span>`;
+    });
+  }
+  badgesContainer.innerHTML = badgesHTML || '<span class="text-xs text-nl-textMuted">No categories</span>';
+  const reqMinDiv = document.getElementById('req-min-content');
+  const reqRecDiv = document.getElementById('req-rec-content');
+  if (game.pc_requirements) {
+    reqMinDiv.innerHTML = game.pc_requirements.minimum || 'No minimum requirements listed.';
+    reqRecDiv.innerHTML = game.pc_requirements.recommended || 'No recommended requirements listed.';
+  } else {
+    reqMinDiv.innerHTML = 'N/A';
+    reqRecDiv.innerHTML = 'N/A';
+  }
+  const bypassBtn = document.getElementById('detail-bypass-btn');
+  if (bypassBtn) {
+    if (bypassAppIdMap.hasOwnProperty(game.name)) {
+      bypassBtn.style.display = 'flex';
+    } else {
+      bypassBtn.style.display = 'none';
+    }
+  }
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-game-details').classList.add('active');
+  lucide.createIcons();
+}
+
+function showAccountSelection() {
+  if (!currentDetailGame) return;
+  const appid = currentDetailGame.steam_appid;
+  const accounts = discordAccounts[appid] || [];
+  const container = document.getElementById('account-selection-container');
+  if (accounts.length === 0) {
+    container.innerHTML = '<p class="text-nl-textMuted">No accounts available for this game.</p>';
+  } else {
+    container.innerHTML = accounts.map(acc => `
+      <div class="bg-nl-card border border-nl-border p-6 rounded-2xl hover:border-nl-pink cursor-pointer group transition-all" onclick="steamLogin('${acc.user}','${acc.pass}')">
+        <div class="flex justify-between items-center">
+          <div>
+            <p class="text-xs text-nl-textMuted uppercase mb-1">Username</p>
+            <p class="font-bold text-lg">${acc.user}</p>
+          </div>
+          <i data-lucide="log-in" class="w-6 h-6 text-nl-textMuted group-hover:text-nl-pink transition-colors"></i>
+        </div>
+      </div>`).join('');
+  }
+  lucide.createIcons();
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-select-account').classList.add('active');
+}
+
+function goBackToDetails() {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-game-details').classList.add('active');
+}
+
+function switchToBypassAndScroll() {
+  if (!currentDetailGame) return;
+  const gameName = currentDetailGame.name;
+  switchTab('bypass');
+  setTimeout(() => {
+    const elem = document.getElementById(`bypass-${gameName.replace(/\s+/g, '-')}`);
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      elem.classList.add('pulse-glow');
+      setTimeout(() => elem.classList.remove('pulse-glow'), 1500);
+    }
+  }, 200);
+}
+
+async function steamLogin(username, password) {
+  const res = await ipcRenderer.invoke('steam-login', username, password);
+  showToast(res.success ? `Launching Steam as ${username}...` : `Launch failed: ${res.error}`, res.success ? 'success' : 'error');
+}
+
+function renderBypassCards() {
+  const container = document.getElementById('bypass-games-container');
+  if (!bypassGames.length) {
+    container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">No bypass games loaded.</p>';
+    return;
+  }
+  container.innerHTML = bypassGames.map(game => {
+    const name = game.name;
+    const status = gameStatuses[name] || { installed: false };
+    const installed = status.installed;
+    const isCustom = status.isCustom;
+    const displayName = isCustom ? `${name} (Custom Path)` : name;
+    const gameInfo = steamGameData[game.steamAppId] || {};
+    const coverImage = gameInfo.header_image || `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.steamAppId}/header.jpg`;
+    const escapedName = name.replace(/'/g, "\\'");
+    return `
+      <div id="bypass-${name.replace(/\s+/g, '-')}" class="game-card rounded-xl bg-nl-card border border-nl-border cursor-pointer" onclick="openBypassDetail('${escapedName}')">
+        <div class="relative aspect-[16/7.5] rounded-t-xl overflow-hidden">
+          <img src="${coverImage}" alt="${displayName}" class="w-full h-full object-cover">
+        </div>
+        <div class="p-3">
+          <h4 class="text-sm font-semibold truncate mb-1.5">${displayName}</h4>
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 ${installed ? 'bg-green-500' : 'bg-nl-textMuted'} rounded-full"></span>
+            <span class="text-[10px] ${installed ? 'text-green-400' : 'text-nl-textMuted'} font-medium uppercase tracking-tighter">
+              ${installed ? (isCustom ? 'Custom Path' : 'Installed') : 'Not Detected'}
+            </span>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+  lucide.createIcons();
+  filterBypass();
+}
+
+function openBypassDetail(gameName) {
+  currentBypassGameName = gameName;
+  const game = bypassGames.find(g => g.name === gameName);
+  if (!game) return;
+  const status = gameStatuses[gameName] || { installed: false, path: null };
+  const installed = status.installed;
+  const isCustom = status.isCustom;
+  const displayName = isCustom ? `${gameName} (Custom Path)` : gameName;
+  const gameInfo = steamGameData[game.steamAppId] || {};
+  const coverImage = gameInfo.header_image || `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${game.steamAppId}/header.jpg`;
+  const markerPath = status.path ? path.join(status.path, 'bypass_applied.txt') : null;
+  const isApplied = markerPath && fs.existsSync(markerPath);
+  const escapedPath = status.path ? status.path.replace(/\\/g, '\\\\').replace(/'/g, "\\'") : '';
+
+  document.getElementById('bypass-detail-banner').src = coverImage;
+  document.getElementById('bypass-detail-title').textContent = displayName;
+  document.getElementById('bypass-detail-status').innerHTML = installed
+    ? `<span class="text-green-400">● Installed</span> ${isCustom ? '<span class="text-nl-pinkLight ml-2">(Custom Path)</span>' : ''}`
+    : `<span class="text-nl-textMuted">● Not Detected</span>`;
+
+  const actionsDiv = document.getElementById('bypass-detail-actions');
+  let actionsHTML = '';
+  if (installed) {
+    const safeName = gameName.replace(/'/g, "\\'");
+    const launchExe = (game.launchExe || game.exeName).replace(/'/g, "\\'");
+    actionsHTML += `
+      <button onclick="launchGame('${safeName}', '${escapedPath}', '${launchExe}')"
+        class="px-5 py-2.5 bg-green-500/20 border border-green-500/40 text-green-400 rounded-xl font-semibold hover:bg-green-500 hover:text-white transition-all flex items-center gap-2">
+        <i data-lucide="play" class="w-4 h-4 fill-current"></i> Launch
+      </button>
+      <button onclick="launchGameAdmin('${safeName}', '${escapedPath}', '${launchExe}')"
+        class="px-5 py-2.5 bg-yellow-500/20 border border-yellow-500/40 text-yellow-400 rounded-xl font-semibold hover:bg-yellow-500 hover:text-white transition-all flex items-center gap-2">
+        <i data-lucide="shield" class="w-4 h-4"></i> Run as Admin
+      </button>
+      <button onclick="openGameFolder('${escapedPath}')"
+        class="px-5 py-2.5 bg-nl-pinkMuted border border-nl-pink/30 text-nl-pinkLight rounded-xl font-semibold hover:bg-nl-pink hover:text-white transition-all flex items-center gap-2">
+        <i data-lucide="folder" class="w-4 h-4"></i> Open Folder
+      </button>`;
+  }
+  if (installed && !isApplied) {
+    actionsHTML += `
+      <button onclick="injectBypassFromDetail('${gameName.replace(/'/g, "\\'")}', '${escapedPath}')"
+        class="px-5 py-2.5 bg-nl-pink text-white rounded-xl font-bold hover:scale-105 transition-transform shadow-lg flex items-center gap-2">
+        <i data-lucide="download" class="w-4 h-4"></i> Inject
+      </button>`;
+  }
+  if (isApplied) {
+    actionsHTML += `
+      <button onclick="verifyBypassFromDetail('${gameName.replace(/'/g, "\\'")}', '${escapedPath}')"
+        class="px-5 py-2.5 bg-nl-pinkMuted border border-nl-pink/30 text-nl-pink rounded-xl font-semibold hover:bg-nl-pink hover:text-white transition-all flex items-center gap-2">
+        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Verify
+      </button>
+      <button onclick="revertBypassFromDetail('${gameName.replace(/'/g, "\\'")}', '${escapedPath}')"
+        class="px-5 py-2.5 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl font-semibold hover:bg-red-500 hover:text-white transition-all">
+        Revert
+      </button>`;
+  }
+  if (!installed) {
+    actionsHTML += `<p class="text-nl-textMuted">Game not found – add a custom path.</p>`;
+  }
+  actionsDiv.innerHTML = actionsHTML;
+  lucide.createIcons();
+
+  const customSection = document.getElementById('custom-path-section');
+  if (isCustom) {
+    customSection.classList.remove('hidden');
+  } else {
+    customSection.classList.add('hidden');
+  }
+
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-bypass-detail').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  document.querySelector('[data-tab="bypass"]').classList.add('active');
+  if (game && game.working === "false") {
+    showBypassWarning();
+  }
+}
+
+function goBackToBypassList() {
+  currentBypassGameName = null;
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-bypass').classList.add('active');
+  renderBypassCards();
+}
+
+async function deleteCustomPath(gameName) {
+  if (!confirm(`Remove custom path for ${gameName}?`)) return;
+  const res = await ipcRenderer.invoke('remove-custom-path', gameName);
+  if (res.success) {
+    showToast('Custom path removed.', 'success');
+    currentBypassGameName = null;
+    await scanForAllGames();
+    renderBypassCards();
+    goBackToBypassList();
+  } else {
+    showToast(res.error || 'Failed to remove path.', 'error');
+  }
+}
+
+async function openGameFolder(gamePath) {
+  await ipcRenderer.invoke('open-folder', gamePath);
+}
+
+async function launchGame(gameName, gamePath, exeName) {
+  const res = await ipcRenderer.invoke('launch-game-exe', { gamePath, exeName });
+  if (!res.success) {
+    showToast(`Launch failed: ${res.error}`, 'error');
+    return;
+  }
+  showToast(`Launching ${gameName}...`, 'success');
+}
+
+async function launchGameAdmin(gameName, gamePath, exeName) {
+  showToast(`Requesting admin launch for ${gameName}...`, 'info', 3000);
+  const res = await ipcRenderer.invoke('launch-game-exe', { 
+    gamePath, 
+    exeName, 
+    runAsAdmin: true 
+  });
+  if (!res.success) {
+    showToast(`Launch failed: ${res.error}`, 'error');
+  } else {
+    showToast(`${gameName} should start after UAC prompt.`, 'success');
+  }
+}
+
+function showProgress(containerId) {
+  const container = document.getElementById(containerId);
+  container.classList.remove('hidden');
+  document.getElementById('bypass-progress-bar').style.width = '0%';
+  document.getElementById('bypass-progress-text').textContent = 'Initializing...';
+  document.getElementById('bypass-progress-percent').textContent = '0%';
+}
+
+function hideProgress(containerId) {
+  document.getElementById(containerId).classList.add('hidden');
+}
+
+function setupProgressHandler() {
+  const handler = (event, data) => {
+    document.getElementById('bypass-progress-bar').style.width = data.percent + '%';
+    document.getElementById('bypass-progress-text').textContent = data.message;
+    document.getElementById('bypass-progress-percent').textContent = data.percent + '%';
+  };
+  ipcRenderer.on('bypass-progress', handler);
+  return handler;
+}
+
+function cleanupProgressHandler(handler) {
+  ipcRenderer.removeListener('bypass-progress', handler);
+}
+
+async function injectBypassFromDetail(gameName, gamePath) {
+  showProgress('bypass-detail-progress');
+  const handler = setupProgressHandler();
+  try {
+    const res = await ipcRenderer.invoke('start-bypass', { gameName, gamePath });
+    if (res.success) {
+      showToast(`${gameName} bypass applied!`, 'success');
+    } else {
+      showToast(`Bypass failed: ${res.error}`, 'error');
+    }
+  } catch(e) {
+    showToast(`Error: ${e.message}`, 'error');
+  } finally {
+    cleanupProgressHandler(handler);
+    setTimeout(() => hideProgress('bypass-detail-progress'), 1500);
+    openBypassDetail(gameName);
+  }
+}
+
+async function verifyBypassFromDetail(gameName, gamePath) {
+  showProgress('bypass-detail-progress');
+  const handler = setupProgressHandler();
+  try {
+    const res = await ipcRenderer.invoke('verify-bypass', { gameName, gamePath });
+    if (res.success) {
+      showToast(`${gameName} verification complete!`, 'success');
+    } else {
+      showToast(`Verification failed: ${res.error}`, 'error');
+    }
+  } catch(e) {
+    showToast(`Error: ${e.message}`, 'error');
+  } finally {
+    cleanupProgressHandler(handler);
+    setTimeout(() => hideProgress('bypass-detail-progress'), 1500);
+    openBypassDetail(gameName);
+  }
+}
+
+async function revertBypassFromDetail(gameName, gamePath) {
+  if (!confirm(`Are you sure you want to revert the bypass for ${gameName}?`)) return;
+  showToast("Restoring original files...", "info");
+  const res = await ipcRenderer.invoke('revert-bypass', { gameName, gamePath });
+  if (res.success) {
+    showToast("Original files restored!", "success");
+    openBypassDetail(gameName);
+  } else {
+    showToast(`Error: ${res.error}`, "error");
+  }
+}
+
+function toggleCustomPathModal() {
+  const modal = document.getElementById('custom-path-modal');
+  if (modal.classList.contains('hidden')) {
+    modal.classList.remove('hidden'); modal.classList.add('show');
+    document.getElementById('path-input').value = '';
+    const select = document.getElementById('custom-game-select');
+    select.innerHTML = '<option value="Not Detected">Not Detected</option>';
+    bypassGames.forEach(g => {
+      select.innerHTML += `<option value="${g.name}">${g.name}</option>`;
+    });
+  } else {
+    modal.classList.add('hidden'); modal.classList.remove('show');
+  }
+  lucide.createIcons();
+}
+
+async function checkGameExistence(dirPath) {
+  if (!document.getElementById('check-exist-toggle').checked) return;
+  if (!dirPath) return;
+  const result = await ipcRenderer.invoke('check-path', dirPath);
+  document.getElementById('custom-game-select').value = result.detected ? result.game : 'Not Detected';
+}
+
+async function applyCustomPath() {
+  const gameName = document.getElementById('custom-game-select').value;
+  const dirPath = document.getElementById('path-input').value.trim();
+  if (gameName === 'Not Detected' || !dirPath) {
+    showToast('Select a valid game and path.', 'error');
+    return;
+  }
+  const res = await ipcRenderer.invoke('add-custom-path', { gameName, customPath: dirPath });
+  if (res.success) {
+    showToast(`Custom path for ${gameName} saved.`, 'success');
+    toggleCustomPathModal();
+    await scanForAllGames();
+    renderBypassCards();
+    renderAccountsFromDiscord();
+  } else {
+    showToast(res.error || 'Failed to save path.', 'error');
+  }
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+  if (tabName === 'bypass') renderBypassCards();
+  if (tabName === 'achievements') refreshAchievements();
+  lucide.createIcons();
+}
+
+async function attemptLogin() {
+  const inputEl = document.getElementById('accessKeyInput');
+  const errorEl = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
+  const key = inputEl.value.trim();
+  inputEl.value = '';
+  if (!key) return;
+  btn.textContent = "Verifying...";
+  try {
+    const isValid = await ipcRenderer.invoke('validate-access-key', key);
+    if (isValid) {
+      await ipcRenderer.invoke('save-key', key);
+      document.getElementById('loginOverlay').classList.add('fade-out');
+      showToast('Login successful!', 'success');
+      await loadAppData();
+      const updateAvailable = await checkForUpdatesAndPrompt();
+      if (!updateAvailable) {
+        // Optionally preload achievements (they are loaded on tab switch)
+      }
+    } else {
+      errorEl.textContent = "Invalid access key.";
+      errorEl.classList.remove('hidden');
+    }
+  } catch(e) {
+    errorEl.textContent = "Network error.";
+    errorEl.classList.remove('hidden');
+  } finally {
+    btn.textContent = "Login";
+  }
+}
+
+async function loadAppData() {
+  const bpPromise = ipcRenderer.invoke('get-bypass-data');
+  const discordPromise = fetchDiscordAccounts();
+
+  const bpData = await bpPromise;
+  bypassGames = bpData;
+  bypassAppIdMap = {};
+  bypassExeMap = {};
+  bypassGames.forEach(g => {
+    bypassAppIdMap[g.name] = g.steamAppId;
+    bypassExeMap[g.exeName] = g.name;
+  });
+
+  const bypassIds = bypassGames.map(g => g.steamAppId);
+  await discordPromise;
+  const discordIds = Object.keys(discordAccounts).map(Number);
+  const allIds = [...new Set([...bypassIds, ...discordIds])];
+  await fetchSteamDataForIds(allIds);
+  await scanForAllGames();
+  renderAccountsFromDiscord();
+  renderBypassCards();
+}
+
+async function autoLogin() {
+  try {
+    const savedKey = await ipcRenderer.invoke('get-saved-key');
+    if (!savedKey) {
+      document.getElementById('loginMessage').textContent = "Enter your access key to continue";
+      return;
+    }
+    const isValid = await ipcRenderer.invoke('validate-access-key', savedKey);
+    if (isValid) {
+      document.getElementById('loginOverlay').classList.add('fade-out');
+      showToast('Welcome back!', 'success');
+      await loadAppData();
+      const updateAvailable = await checkForUpdatesAndPrompt();
+      if (!updateAvailable) {
+        // nothing else
+      }
+    } else {
+      document.getElementById('loginMessage').textContent = "Your saved key is no longer valid. Enter a new key.";
+      showToast("Saved key invalid. Please obtain a new key.", "error");
+    }
+  } catch(e) {
+    console.error('Auto-login error', e);
+  }
+}
+
+function showToast(message, type='info', duration = 3000) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  const colors = { success:'border-green-500/30 bg-green-500/10', error:'border-red-500/30 bg-red-500/10', info:'border-nl-pink/30 bg-nl-pinkMuted' };
+  const icons = { success:'check-circle', error:'alert-circle', info:'info' };
+  toast.className = `toast flex items-center gap-3 px-4 py-3 rounded-xl border ${colors[type]} backdrop-blur-xl shadow-2xl min-w-[280px]`;
+  toast.innerHTML = `<i data-lucide="${icons[type]}" class="w-4 h-4 ${type==='error'?'text-red-400':'text-nl-pink'} shrink-0"></i><span class="text-sm font-medium text-nl-text">${message}</span>`;
+  container.appendChild(toast); lucide.createIcons();
+  setTimeout(() => { toast.classList.add('toast-exit'); setTimeout(() => toast.remove(),300); }, duration);
+}
+
+function showBypassWarning() {
+  const modal = document.getElementById('bypass-warning-modal');
+  modal.classList.remove('hidden');
+  modal.classList.add('show');
+  lucide.createIcons();
+}
+
+function closeBypassWarning() {
+  const modal = document.getElementById('bypass-warning-modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('show');
+}
+
+function closeApp() { ipcRenderer.send('close-app'); }
+function minimizeApp() { ipcRenderer.send('minimize-app'); }
+function maximizeApp() { ipcRenderer.send('maximize-app'); }
+
+document.addEventListener('keydown', (e) => {
+  if (e.key==="F12"||(e.ctrlKey&&e.shiftKey&&e.key==="I")||(e.ctrlKey&&e.key==="U")) {
+    e.preventDefault();
+    return false;
+  }
+});
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+window.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  autoLogin();
+  fetchUnlockKeyUrl();
+});
+</script>
+</body>
+</html>
