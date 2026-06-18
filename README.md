@@ -1,7 +1,7 @@
 # 🌌 Nightlight Game Launcher (V5)
 
 <p align="center">
-  <strong>Lightweight Electron app to manage your Steam library. Switch accounts, apply bypasses, and launch games — without bloat.</strong>
+  <strong>Lightweight Electron app to manage your Steam library. Switch accounts, apply bypasses, and launch games.</strong>
 </p>
 
 <p align="center">
@@ -31,13 +31,6 @@
 3. **Use the sidebar** to navigate between Home, Accounts, and Bypass.
 
 > 📺 **V5 tutorial** – coming soon (once I’ve finished building it!).
-
----
-
-## 🔓 Open Source & Transparency
-
-This project is fully open source. You can audit every line of code yourself.  
-I believe in honesty and transparency – that’s why the entire launcher will be available in this repository.
 
 ---
 
