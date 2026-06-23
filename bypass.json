@@ -1,0 +1,54 @@
+{
+  "games": [
+    {
+      "name": "Grand Theft Auto V",
+      "steamAppId": 271590,
+      "exeName": "PlayGTAV.exe",
+      "files": [
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/bink2w64.dll",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/launc.dll",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/orig_socialclub.dll",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/PlayGTAV.exe",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAVFix/socialclub.dll"
+      ]
+    },
+    {
+      "name": "Red Dead Redemption 2",
+      "steamAppId": 1174180,
+      "exeName": "RDR2.exe",
+      "launchExe": "Launcher.exe",
+      "files": [
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR2Files/1911.dll",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR2Files/bink2w64.dll",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR2Files/Launcher.exe",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR2Files/RDR2.exe"
+      ]
+    },
+    {
+      "name": "Red Dead Redemption",
+      "steamAppId": 2668510,
+      "exeName": "RDR.exe",
+      "launchExe": "PlayRDR.exe",
+      "files": [
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR1Files/1911.dll",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR1Files/PlayRDR.exe",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR1Files/RDR.exe",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/RDR1Files/steam_api64.dll"
+      ]
+    },
+    {
+      "name": "Grand Theft Auto IV",
+      "steamAppId": 12210,
+      "exeName": "GTAIV.exe",
+      "launchExe": "PlayGTAIV.exe",
+      "files": [
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/binkw32.dll",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/GTAIV.exe",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/launc.dll",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/orig_socialclub.dll",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/PlayGTAIV.exe",
+        "https://github.com/uxqc/L4unch3rH0sting/releases/download/GTAIVFiles/socialclub.dll"
+      ]
+    }
+  ]
+}
