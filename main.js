@@ -1,4 +1,4 @@
-// main.js (with Steam auto‑detection)
+// main.js (with Steam auto‑detection, cross‑platform zip, batching & better error reporting)
 const { app, BrowserWindow, ipcMain, shell, net, dialog } = require('electron');
 const { execSync } = require('child_process');
 const path = require('path');
@@ -8,19 +8,35 @@ const os = require('os');
 const { exec } = require('child_process');
 const SteamUser = require('steam-user');
 
+// Disable GPU cache if you want
+app.commandLine.appendSwitch('disable-gpu-cache');
+
+// ⬇️ Fix the disk cache errors
+app.setPath('userData', path.join(os.homedir(), 'AppData', 'Local', 'nightlight-launcher'));
 app.commandLine.appendSwitch('disable-devtools');
 
 let mainWindow;
-let detectedSteamPath = 'C:\\Program Files (x86)\\Steam'; // default fallback
+let detectedSteamPath = 'C:\\Program Files (x86)\\Steam'; // default fallback (Windows)
 
 // ── Sanitize game name for use in folder names ──────────────────────
 function sanitizeForPath(name) {
   return name.replace(/[<>:"/\\|?*]/g, '_');
 }
 
-function extractZip(zipPath, destDir) {
-  if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
-  execSync(`powershell -Command "Expand-Archive -Path '${zipPath}' -DestinationPath '${destDir}' -Force"`, { stdio: 'ignore' });
+// ── Cross‑platform zip extraction (prefers adm‑zip, falls back to PowerShell) ──
+let extractZip;
+try {
+  const AdmZip = require('adm-zip');
+  extractZip = (zipPath, destDir) => {
+    const zip = new AdmZip(zipPath);
+    zip.extractAllTo(destDir, true);
+  };
+} catch (_) {
+  // Fallback for Windows only if adm‑zip isn’t installed
+  extractZip = (zipPath, destDir) => {
+    if (!fs.existsSync(destDir)) fs.mkdirSync(destDir, { recursive: true });
+    execSync(`powershell -Command "Expand-Archive -Path '${zipPath}' -DestinationPath '${destDir}' -Force"`, { stdio: 'ignore' });
+  };
 }
 
 // ── File download with redirect support ─────────────────────────────
@@ -89,8 +105,9 @@ function downloadFile(urlStr, destPath, onProgress) {
 
 ipcMain.handle('get-app-version', () => app.getVersion());
 
-// ── Steam auto‑detection ──────────────────────────────────────────
+// ── Steam auto‑detection (hardened) ──────────────────────────────────
 function getSteamInstallPath() {
+  // Windows registry
   try {
     const regOutput = execSync(
       'reg query "HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Valve\\Steam" /v InstallPath',
@@ -102,14 +119,25 @@ function getSteamInstallPath() {
       if (fs.existsSync(p)) return p;
     }
   } catch (_) { /* registry read failed */ }
-  const defaultPath = 'C:\\Program Files (x86)\\Steam';
-  if (fs.existsSync(defaultPath)) return defaultPath;
+  // Fallback for other OS – use common paths
+  const platform = os.platform();
+  if (platform === 'win32') {
+    const defaultPath = 'C:\\Program Files (x86)\\Steam';
+    if (fs.existsSync(defaultPath)) return defaultPath;
+  } else if (platform === 'darwin') {
+    const defaultPath = path.join(os.homedir(), 'Library', 'Application Support', 'Steam');
+    if (fs.existsSync(defaultPath)) return defaultPath;
+  } else if (platform === 'linux') {
+    const defaultPath = path.join(os.homedir(), '.steam', 'steam');
+    if (fs.existsSync(defaultPath)) return defaultPath;
+  }
   return null;
 }
 
 function getSteamLibraryFolders(steamPath) {
   const libraries = [];
-  if (steamPath && fs.existsSync(steamPath)) libraries.push(steamPath);
+  if (!steamPath) return libraries;                      // ← guard against null
+  if (fs.existsSync(steamPath)) libraries.push(steamPath);
   const vdfPath = path.join(steamPath, 'steamapps', 'libraryfolders.vdf');
   if (!fs.existsSync(vdfPath)) return libraries;
   try {
@@ -140,7 +168,7 @@ function getSavedKey() {
   return null;
 }
 
-// ── Bypass API integration (uses user's saved key) ──────────────────
+// ── Bypass API integration ──────────────────────────────────────────
 let bypassGameData = null;
 const BYPASS_BASE_URL = 'https://onajlikezz.xyz/api/bypass.php';
 const DOWNLOAD_BASE_URL = 'https://onajlikezz.xyz/api/downloadManager.php';
@@ -226,7 +254,6 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Detect Steam installation early
   const steamPath = getSteamInstallPath();
   if (steamPath) {
     detectedSteamPath = steamPath;
@@ -362,7 +389,7 @@ ipcMain.handle('test-steam-login', async (event, username, password) => {
       if (!resolved) {
         resolved = true;
         client.logOff();
-        resolve({ success: false, error: 'Timeout after 15 seconds' });
+        resolve({ success: false, error: 'Timeout after 15 seconds', shouldReport: true });
       }
     }, 15000);
 
@@ -371,7 +398,7 @@ ipcMain.handle('test-steam-login', async (event, username, password) => {
         resolved = true;
         clearTimeout(timeout);
         client.logOff();
-        resolve({ success: true });
+        resolve({ success: true, shouldReport: true });
       }
     });
     client.on('error', (err) => {
@@ -380,28 +407,34 @@ ipcMain.handle('test-steam-login', async (event, username, password) => {
         clearTimeout(timeout);
         client.logOff();
         let errorMsg = err.message || 'Unknown error';
-        if (errorMsg.includes('InvalidPassword')) errorMsg = 'Invalid password';
-        else if (errorMsg.includes('AccountLoginDeniedNoMail')) errorMsg = 'Steam Guard required (cannot bypass)';
-        resolve({ success: false, error: errorMsg });
+        let shouldReport = true;
+
+        if (errorMsg.includes('InvalidPassword')) {
+          errorMsg = 'Invalid password';
+        } else if (errorMsg.includes('AccountLoginDeniedNoMail')) {
+          errorMsg = 'Steam Guard required (cannot bypass)';
+        } else if (errorMsg.includes('AlreadyLoggedInElsewhere') || errorMsg.toLowerCase().includes('already_logged_in')) {
+          errorMsg = 'Already logged in elsewhere (valid account)';
+          shouldReport = false;   // ← don't delete this account
+        }
+        resolve({ success: false, error: errorMsg, shouldReport });
       }
     });
     client.logOn({ accountName: username, password: password });
   });
 });
 
-// ── Launch Steam client with credentials ────────────────────────────
+// ── Launch Steam client with credentials (fire‑and‑forget) ────────
 ipcMain.handle('steam-login', async (event, username, password) => {
-  return new Promise((resolve) => {
-    exec('taskkill /F /IM steam.exe', (err) => {
-      setTimeout(() => {
-        const steamExe = path.join(detectedSteamPath, 'Steam.exe');
-        exec(`"${steamExe}" -login ${username} ${password}`, (launchErr) => {
-          if (launchErr) resolve({ success: false, error: launchErr.message });
-          else resolve({ success: true });
-        });
-      }, 1000);
-    });
-  });
+  // Use the Steam protocol – works whether Steam is already running or not
+  const steamUrl = `steam://login/${encodeURIComponent(username)}/${encodeURIComponent(password)}`;
+  try {
+    await shell.openExternal(steamUrl);
+    // openExternal returns Promise<void>; if it doesn't throw, the OS was able to handle the protocol
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
 });
 
 // ── Account Checker handler (hidden but kept) ────────────────────────
@@ -497,14 +530,11 @@ function getInstallDirFromManifests(steamAppId, libraries) {
     if (!fs.existsSync(manifestPath)) continue;
     try {
       const content = fs.readFileSync(manifestPath, 'utf8');
-      // The relevant line looks like: "installdir"		"Some Folder Name"
       const match = content.match(/"installdir"\s+"([^"]+)"/);
       if (match && match[1]) {
         const dirName = match[1].trim();
         const fullPath = path.join(lib, 'steamapps', 'common', dirName);
-        if (fs.existsSync(fullPath)) {
-          return fullPath; // found
-        }
+        if (fs.existsSync(fullPath)) return fullPath;
       }
     } catch (e) {
       console.error(`Failed to read manifest ${manifestName}:`, e);
@@ -526,14 +556,12 @@ ipcMain.handle('get-auto-game-paths', async () => {
     const id = game.steamAppId;
     if (!id) continue;
 
-    // 1) Try exact match via appmanifest (most reliable)
     const manifestPath = getInstallDirFromManifests(id, libraries);
     if (manifestPath) {
       autoPaths[id] = manifestPath;
       continue;
     }
 
-    // 2) Fallback: use folderName / display name (for manually added games, etc.)
     const folderName = game.folderName || game.name;
     if (!folderName) continue;
     for (const lib of libraries) {

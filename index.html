@@ -324,7 +324,7 @@
         <i data-lucide="download" class="w-4 h-4"></i> Download Now
       </button>
       <button id="update-exit-btn" class="flex-1 py-2.5 bg-nl-card border border-nl-border rounded-lg font-bold hover:bg-red-500/20 hover:border-red-500 transition-colors">
-        Exit
+        Remind Later
       </button>
     </div>
   </div>
@@ -376,6 +376,154 @@ const { ipcRenderer } = require('electron');
 const fs = require('fs');
 const path = require('path');
 let CURRENT_VERSION;
+let bypassLoading = false;
+
+// ── Faster Steam data fetching (batch request) ──
+async function fetchSteamDataForIds(ids) {
+  if (!ids.length) return;
+  // Ensure we don’t re‑fetch data we already have
+  const missingIds = ids.filter(id => !steamGameData[String(id)]);
+  if (missingIds.length === 0) return;
+
+  console.log(`Fetching Steam data for ${missingIds.length} game(s):`, missingIds);
+
+  try {
+    const url = `https://store.steampowered.com/api/appdetails?appids=${missingIds.join(',')}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Steam API error: ${res.status}`);
+    const json = await res.json();
+    for (const [id, data] of Object.entries(json)) {
+      if (data && data.success) {
+        steamGameData[String(id)] = data.data;   // force string key
+      }
+    }
+  } catch (e) {
+    console.error('Steam batch fetch failed:', e);
+  }
+}
+
+// ── Scroll to bypass – fixed to use Steam App ID ──
+function switchToBypassAndScroll() {
+  if (!currentDetailGame) return;
+  const appId = currentDetailGame.steam_appid;
+  switchTab('bypass');
+  setTimeout(() => {
+    const elem = document.getElementById(`bypass-${appId}`);
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      elem.classList.add('pulse-glow');
+      setTimeout(() => elem.classList.remove('pulse-glow'), 1500);
+    }
+  }, 200);
+}
+
+// ── Login with current game – skip report when shouldReport === false ──
+async function loginWithCurrentGame() {
+  if (!currentDetailGame) return;
+  const gameId = currentDetailGame.steam_appid;
+  const gameName = currentDetailGame.name;
+  
+  let attempts = 0;
+  const maxAttempts = 5;
+  let success = false;
+  
+  showToast(`Attempting to get working account for ${gameName}...`, 'info', 2000);
+  
+  while (attempts < maxAttempts && !success) {
+    attempts++;
+    try {
+      const creds = await ipcRenderer.invoke('get-game-credentials', gameId);
+      if (!creds.username || !creds.password) throw new Error('Invalid credentials');
+      showToast(`Testing account ${creds.username} (attempt ${attempts}/${maxAttempts})...`, 'info', 3000);
+      
+      const test = await ipcRenderer.invoke('test-steam-login', creds.username, creds.password);
+      if (test.success) {
+        const launch = await ipcRenderer.invoke('steam-login', creds.username, creds.password);
+      if (launch.success) {
+        showToast(`Launching Steam as ${creds.username}...`, 'success');
+      } else {
+        showToast(`Failed to send login: ${launch.error}`, 'error');
+      }
+      } else {
+        showToast(`Account ${creds.username} invalid: ${test.error}. Trying another...`, 'error', 3000);
+        // Only report if shouldReport is not explicitly false
+        if (test.shouldReport !== false) {
+          try {
+            const reportKey = await ipcRenderer.invoke('get-saved-key');
+            if (reportKey) {
+              ipcRenderer.invoke('report-invalid-account', { username: creds.username, key: reportKey });
+            }
+          } catch(e) {
+            console.error('Failed to report invalid account:', e);
+          }
+        }
+      }
+    } catch (err) {
+      showToast(`Error: ${err.message}`, 'error');
+    }
+    if (!success && attempts < maxAttempts) {
+      await new Promise(r => setTimeout(r, 1500));
+    }
+  }
+  if (!success) {
+    showToast(`Failed to find a working account after ${maxAttempts} attempts.`, 'error');
+  }
+}
+
+// ── Load app data (uses batch fetch for speed) ──
+async function loadAppData() {
+  bypassLoading = true;                                    // ←
+  try {
+    bypassGames = await ipcRenderer.invoke('get-bypass-data');
+  } catch(e) {
+    bypassGames = [];
+    showToast('Failed to load bypass games.', 'error');
+  }
+  const bypassIds = bypassGames.map(g => g.steamAppId);
+  await fetchSteamDataForIds(bypassIds);
+  await fetchGameList();
+  const gameIdsFromAPI = gameList.map(g => g.id);
+  const allIds = [...new Set([...bypassIds, ...gameIdsFromAPI])];
+  await fetchSteamDataForIds(allIds);
+
+  // Load custom paths
+  gameStatuses = {};
+  try {
+    const savedPaths = await ipcRenderer.invoke('get-custom-paths');
+    for (const game of bypassGames) {
+      const id = game.steamAppId;
+      const gameNameKey = game.name || String(id);
+      const customPath = savedPaths[gameNameKey];
+      if (customPath && fs.existsSync(customPath)) {
+        gameStatuses[id] = { installed: true, path: customPath, isCustom: true };
+      } else {
+        gameStatuses[id] = { installed: false, path: '' };
+      }
+    }
+  } catch(e) {
+    console.error('Failed to load saved paths', e);
+  }
+
+  // Auto‑detect
+  try {
+    const autoPaths = await ipcRenderer.invoke('get-auto-game-paths');
+    for (const game of bypassGames) {
+      const id = game.steamAppId;
+      if (!gameStatuses[id] || !gameStatuses[id].installed) {
+        const autoPath = autoPaths[id];
+        if (autoPath) {
+          gameStatuses[id] = { installed: true, path: autoPath, isCustom: false };
+        }
+      }
+    }
+  } catch(e) {
+    console.error('Auto‑detection failed:', e);
+  }
+
+  await renderAccountsFromAPI();
+  renderBypassCards();
+  bypassLoading = false;
+}
 
 document.querySelector('.title-bar').addEventListener('dblclick', (e) => {
   if (!e.target.closest('button')) maximizeApp();
@@ -454,7 +602,9 @@ async function checkForUpdatesAndPrompt() {
         ipcRenderer.invoke('open-external-link', 'https://github.com/onajlikezz/Nightlight-Game-Launcher/releases');
       });
       newExitBtn.addEventListener('click', () => {
-        ipcRenderer.send('close-app');
+        const modal = document.getElementById('update-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
       });
       return true;
     }
@@ -473,17 +623,6 @@ let currentBypassGameName = null;
 // Game list from API
 let gameList = [];
 let currentDetailGame = null;
-
-async function fetchSteamDataForIds(ids) {
-  for (const id of ids) {
-    if (steamGameData[id]) continue;
-    try {
-      const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${id}`);
-      const json = await res.json();
-      if (json[id]?.success) steamGameData[id] = json[id].data;
-    } catch(e) { console.error('Steam fetch error', e); }
-  }
-}
 
 // Fetch game list from API
 async function fetchGameList() {
@@ -604,74 +743,14 @@ async function openGameDetail(gameId) {
   lucide.createIcons();
 }
 
-async function loginWithCurrentGame() {
-  if (!currentDetailGame) return;
-  const gameId = currentDetailGame.steam_appid;
-  const gameName = currentDetailGame.name;
-  
-  let attempts = 0;
-  const maxAttempts = 5;
-  let success = false;
-  
-  showToast(`Attempting to get working account for ${gameName}...`, 'info', 2000);
-  
-  while (attempts < maxAttempts && !success) {
-    attempts++;
-    try {
-      const creds = await ipcRenderer.invoke('get-game-credentials', gameId);
-      if (!creds.username || !creds.password) throw new Error('Invalid credentials');
-      showToast(`Testing account ${creds.username} (attempt ${attempts}/${maxAttempts})...`, 'info', 3000);
-      
-      const test = await ipcRenderer.invoke('test-steam-login', creds.username, creds.password);
-      if (test.success) {
-        const launch = await ipcRenderer.invoke('steam-login', creds.username, creds.password);
-        if (launch.success) {
-          showToast(`Logged in as ${creds.username}! Steam is starting...`, 'success');
-          success = true;
-        } else {
-          showToast(`Launch failed: ${launch.error}`, 'error');
-          success = false;
-          break;
-        }
-      } else {
-        showToast(`Account ${creds.username} invalid: ${test.error}. Trying another...`, 'error', 3000);
-        try {
-          const reportKey = await ipcRenderer.invoke('get-saved-key');
-          if (reportKey) {
-            ipcRenderer.invoke('report-invalid-account', { username: creds.username, key: reportKey });
-          }
-        } catch(e) {
-          console.error('Failed to report invalid account:', e);
-        }
-      }
-    } catch (err) {
-      showToast(`Error: ${err.message}`, 'error');
-    }
-    if (!success && attempts < maxAttempts) {
-      await new Promise(r => setTimeout(r, 1500));
-    }
-  }
-  if (!success) {
-    showToast(`Failed to find a working account after ${maxAttempts} attempts.`, 'error');
-  }
-}
-
-function switchToBypassAndScroll() {
-  if (!currentDetailGame) return;
-  const gameName = currentDetailGame.name;
-  switchTab('bypass');
-  setTimeout(() => {
-    const elem = document.getElementById(`bypass-${gameName.replace(/\s+/g, '-')}`);
-    if (elem) {
-      elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      elem.classList.add('pulse-glow');
-      setTimeout(() => elem.classList.remove('pulse-glow'), 1500);
-    }
-  }, 200);
-}
-
 function renderBypassCards() {
   const container = document.getElementById('bypass-games-container');
+
+  if (bypassLoading) {                                     // ← new block
+    container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">Loading bypass games…</p>';
+    return;
+  }
+
   if (!bypassGames.length) {
     container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">No bypass games loaded.</p>';
     return;
@@ -707,8 +786,34 @@ async function openBypassDetail(steamAppId) {
   const game = bypassGames.find(g => g.steamAppId == steamAppId);
   if (!game) return;
   currentBypassGameName = steamAppId;
-  const id = game.steamAppId;
+  const id = String(steamAppId);
 
+  // 🆕 Load Steam data if missing
+  if (!steamGameData[id]) {
+    // Show a temporary “loading” state in the UI
+    document.getElementById('bypass-detail-title').textContent = game.name || `Steam App ${id}`;
+    document.getElementById('bypass-detail-banner').src = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${id}/header.jpg`;
+    document.getElementById('bypass-detail-date').textContent = 'Loading…';
+    document.getElementById('bypass-detail-metacritic').textContent = 'Loading…';
+    document.getElementById('bypass-detail-developer').textContent = 'Loading…';
+    document.getElementById('bypass-detail-publisher').textContent = 'Loading…';
+    document.getElementById('bypass-detail-description').textContent = 'Fetching game details…';
+    document.getElementById('bypass-detail-categories-genres').innerHTML = '';
+    // Also disable action buttons until we have a path
+    document.getElementById('bypass-detail-actions').innerHTML = '';
+
+    // Switch to the detail tab immediately so the user sees the loading state
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-bypass-detail').classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelector('[data-tab="bypass"]').classList.add('active');
+    lucide.createIcons();
+
+    // Fetch the missing data
+    await fetchSteamDataForIds([id]);
+  }
+
+  // Now proceed with the normal rendering (data should be available)
   const gameInfo = steamGameData[id] || {};
   const status = gameStatuses[id] || { installed: false, path: '' };
   const pathValue = status.path || '';
@@ -743,12 +848,12 @@ async function openBypassDetail(steamAppId) {
   pathInput.value = pathValue;
   pathInput.readOnly = false;
 
+  // Rebuild action buttons (same as before)
   const actionsDiv = document.getElementById('bypass-detail-actions');
   const hasPath = pathValue.trim() !== '';
   const disabledAttr = hasPath ? '' : 'disabled';
 
   let actionsHTML = '';
-
   if (game.SecurityExclusive === 'true' || game.securityExclusive === true) {
     actionsHTML += `
       <div class="w-full bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 mb-3 flex flex-col gap-2">
@@ -797,6 +902,7 @@ async function openBypassDetail(steamAppId) {
     showBypassWarning();
   }
 
+  // Switch to detail tab (if not already there)
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-bypass-detail').classList.add('active');
   document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
@@ -1004,9 +1110,9 @@ async function attemptLogin() {
     const isValid = await ipcRenderer.invoke('validate-access-key', key);
     if (isValid) {
       await ipcRenderer.invoke('save-key', key);
+      loadAppData();
       document.getElementById('loginOverlay').classList.add('fade-out');
       showToast('Login successful!', 'success');
-      await loadAppData();
     } else {
       errorEl.textContent = "Invalid access key.";
       errorEl.classList.remove('hidden');
@@ -1017,58 +1123,6 @@ async function attemptLogin() {
   } finally {
     btn.textContent = "Login";
   }
-}
-
-async function loadAppData() {
-  try {
-    bypassGames = await ipcRenderer.invoke('get-bypass-data');
-  } catch(e) {
-    bypassGames = [];
-    showToast('Failed to load bypass games.', 'error');
-  }
-  const bypassIds = bypassGames.map(g => g.steamAppId);
-  await fetchSteamDataForIds(bypassIds);
-  await fetchGameList();
-  const gameIdsFromAPI = gameList.map(g => g.id);
-  const allIds = [...new Set([...bypassIds, ...gameIdsFromAPI])];
-  await fetchSteamDataForIds(allIds);
-
-  // ── Load saved custom paths ───────────────────────────
-  gameStatuses = {};
-  try {
-    const savedPaths = await ipcRenderer.invoke('get-custom-paths');
-    for (const game of bypassGames) {
-      const id = game.steamAppId;
-      const gameNameKey = game.name || String(id);
-      const customPath = savedPaths[gameNameKey];
-      if (customPath && fs.existsSync(customPath)) {
-        gameStatuses[id] = { installed: true, path: customPath, isCustom: true };
-      } else {
-        gameStatuses[id] = { installed: false, path: '' };
-      }
-    }
-  } catch(e) {
-    console.error('Failed to load saved paths', e);
-  }
-
-  // ── Auto‑detect Steam game folders ─────────────────────
-  try {
-    const autoPaths = await ipcRenderer.invoke('get-auto-game-paths');
-    for (const game of bypassGames) {
-      const id = game.steamAppId;
-      if (!gameStatuses[id] || !gameStatuses[id].installed) {
-        const autoPath = autoPaths[id];
-        if (autoPath) {
-          gameStatuses[id] = { installed: true, path: autoPath, isCustom: false };
-        }
-      }
-    }
-  } catch(e) {
-    console.error('Auto‑detection failed:', e);
-  }
-
-  await renderAccountsFromAPI();
-  renderBypassCards();
 }
 
 async function autoLogin() {
@@ -1127,21 +1181,12 @@ document.addEventListener('keydown', (e) => {
   }
 });
 document.addEventListener('contextmenu', (e) => e.preventDefault());
-
 window.addEventListener('DOMContentLoaded', async () => {
   lucide.createIcons();
 
-  // ✅ Get version from main process (safe even after packaging)
   CURRENT_VERSION = await ipcRenderer.invoke('get-app-version');
-
-  // Check for updates BEFORE showing the login screen
   const updateNeeded = await checkForUpdatesAndPrompt();
-  if (updateNeeded) {
-    document.getElementById('loginOverlay').style.display = 'none';
-    return;
-  }
 
-  // No update required → continue with login
   autoLogin();
   fetchUnlockKeyUrl();
 });
