@@ -1,6 +1,6 @@
 {
   "name": "nightlight-launcher",
-  "version": "5.2.5",
+  "version": "5.2.7",
   "description": "Playing is funner when you dont have to pay!",
   "main": "main.js",
   "scripts": {

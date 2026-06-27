@@ -1,0 +1,109 @@
+{
+  "login": {
+    "accessKey": "Pristupni ključ",
+    "button": "Prijavi se",
+    "unlockKey": "Otključaj ključ",
+    "enterKey": "Unesite svoj pristupni ključ da nastavite",
+    "invalid": "Nevalidan pristupni ključ.",
+    "networkError": "Greška mreže."
+  },
+  "nav": {
+    "main": "Glavna",
+    "accounts": "Nalozi",
+    "bypass": "Zaobilazak",
+    "settings": "Podešavanja",
+    "socials": "Društvene mreže"
+  },
+  "accounts": {
+    "title": "Dostupne igre",
+    "refresh": "Osveži",
+    "search": "Pretraži igre...",
+    "loading": "Učitavanje igara..."
+  },
+  "bypass": {
+    "title": "Spisak zaobilazaka",
+    "search": "Pretraži zaobilazak...",
+    "loading": "Učitavanje zaobilazaka..."
+  },
+  "settings": {
+    "title": "Podešavanja",
+    "language": {
+      "title": "Jezik",
+      "description": "Odaberite željeni jezik"
+    }
+  },
+  "language": {
+    "en": "Engleski",
+    "es": "Španski",
+    "in": "Indijski (Hindi)",
+    "rs": "Srpski"
+  },
+  "common": {
+    "loading": "Učitavanje igara..."
+  },
+  "detail": {
+    "releaseDate": "Datum izlaska",
+    "metacritic": "Metacritic",
+    "developer": "Developer",
+    "publisher": "Izdavač",
+    "description": "Opis",
+    "categoriesGenres": "Kategorije / Žanrovi",
+    "systemRequirements": "Sistemski zahtevi",
+    "minimum": "Minimalni",
+    "recommended": "Preporučeni",
+    "noDescription": "Nema dostupnog opisa.",
+    "noCategories": "Nema kategorija",
+    "noMinRequirements": "Nema navedenih minimalnih zahteva.",
+    "noRecRequirements": "Nema navedenih preporučenih zahteva.",
+    "steamId": "Steam ID:"
+  },
+  "bypassDetail": {
+    "backToList": "Nazad na spisak zaobilazaka",
+    "gamePath": "Putanja igre",
+    "notSet": "Nije postavljeno",
+    "browse": "Pretraži",
+    "launch": "Pokreni",
+    "openFolder": "Otvori fasciklu",
+    "inject": "Ubaci",
+    "verify": "Proveri",
+    "statusInstalled": "● Instalirano",
+    "statusCustomPath": "● Prilagođena putanja",
+    "statusAutoDetected": "● Automatski otkriveno",
+    "statusNotSet": "● Putanja nije navedena",
+    "warningTitle": "Upozorenje",
+    "warningNotWorking": "Prijavljeno je da ovaj zaobilazak ne radi.\nMožete pokušati, ali ne garantujemo uspeh.",
+    "warningOK": "U redu",
+    "securityExclusionTitle": "Potrebno izuzimanje iz sigurnosti",
+    "warningSecurityExclusion": "⚠️ Ovaj zaobilazak zahteva dodavanje fascikle igre u izuzetke Windows sigurnosti.",
+    "openWindowsSecurity": "Otvori Windows sigurnost",
+    "securityExclusionOK": "U redu",
+    "bypassApplied": "Zaobilazak je primenjen!",
+    "bypassFailed": "Zaobilazak nije uspeo: {error}",
+    "launchFailed": "Pokretanje nije uspelo: {error}",
+    "gameLaunched": "Igra je pokrenuta!"
+  },
+  "gameDetail": {
+    "backToGames": "Nazad na igre",
+    "loginWithRandomAccount": "Prijavite se sa slučajnim nalogom",
+    "injectBypass": "Ubaci zaobilazak"
+  },
+  "updateModal": {
+    "title": "Potrebno je ažuriranje",
+    "message": "Da biste koristili Nightlight Launcher, morate ga ažurirati na najnoviju verziju.",
+    "yourVersion": "Vaša verzija:",
+    "latestVersion": "Najnovija verzija:",
+    "downloadNow": "Preuzmi odmah",
+    "remindLater": "Podseti kasnije"
+  },
+  "toasts": {
+    "welcomeBack": "Dobrodošli nazad!",
+    "loginSuccessful": "Prijavljivanje uspešno!",
+    "savedKeyInvalid": "Sačuvani ključ nije važeći. Nabavite novi ključ.",
+    "gameFilesFound": "✅ Ova lokacija sadrži fajlove igre",
+    "gameFilesWrong": "⚠️ Ova lokacija možda nije ispravna",
+    "folderAlreadyAssigned": "Ova fascikla je već dodeljena drugoj igri. Izaberite drugu fasciklu.",
+    "pathEmpty": "Putanja igre nije podešena.",
+    "noAccountsFound": "Nije pronađen ispravan nalog nakon {attempts} pokušaja.",
+    "languageChanged": "Jezik promenjen na {language}"
+  }
+}

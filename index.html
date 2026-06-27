@@ -1,4 +1,3 @@
-<!-- index.html (updated – revert removed) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nightlight Game Launcher</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"
+        onerror="this.onerror=null;this.href='';document.body.style.fontFamily='sans-serif'">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
@@ -54,6 +54,34 @@
     select option { background:#1a111c; color:#f0e6f0; }
     .bypass-card { transition:all 0.25s; }
     .bypass-card:hover { transform:translateY(-3px); box-shadow:0 8px 25px rgba(232,67,147,0.2); }
+    .img-fallback {
+      background: linear-gradient(135deg, #2d2231, #1a111c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8a7590;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+    .bg-nl-bg { background: #0d0a0e; }
+    .bg-nl-surface { background: #1a111c; }
+    .bg-nl-card { background: #221a25; }
+    .text-nl-text { color: #f0e6f0; }
+    .text-nl-textMuted { color: #8a7590; }
+    .border-nl-border { border-color: rgba(232,67,147,0.12); }
+    .rounded-xl { border-radius: 0.75rem; }
+    .p-4 { padding: 1rem; }
+    .flex { display: flex; }
+    .hidden { display: none; }
+    .grid { display: grid; }
+    .gap-4 { gap: 1rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .font-bold { font-weight: 700; }
+    .hover\:bg-nl-pinkDark:hover { background-color: #b83280; }
+    .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
   </style>
 </head>
 <body class="bg-nl-bg text-nl-text">
@@ -62,24 +90,20 @@
   <div class="w-full max-w-sm animate-float-in">
     <div class="text-center mb-8">
       <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-nl-pinkMuted flex items-center justify-center pulse-glow">
-        <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" alt="Nightlight" class="w-14 h-14 object-contain">
+        <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" alt="Nightlight" class="w-14 h-14 object-contain" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Crect width=%2240%22 height=%2240%22 fill=%22%23e84393%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2220%22%3ENL%3C/text%3E%3C/svg%3E'">
       </div>
       <h1 class="text-2xl font-bold mb-1">Nightlight</h1>
-      <p class="text-sm text-nl-textMuted" id="loginMessage">Enter your access key to continue</p>
+      <p class="text-sm text-nl-textMuted" id="loginMessage" data-i18n="login.enterKey">Enter your access key to continue</p>
     </div>
     <div class="bg-nl-surface border border-nl-border rounded-2xl p-6">
       <div class="mb-4">
-        <label class="text-xs font-medium text-nl-textMuted uppercase tracking-wider mb-2 block">Access Key</label>
+        <label class="text-xs font-medium text-nl-textMuted uppercase tracking-wider mb-2 block" data-i18n="login.accessKey">Access Key</label>
         <input type="password" id="accessKeyInput" placeholder="Enter your key..." class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-3 text-sm text-nl-text focus:outline-none focus:border-nl-pink/50" onkeydown="if(event.key==='Enter')attemptLogin()">
       </div>
-      <p id="loginError" class="text-xs text-red-400 mb-3 hidden">Invalid access key.</p>
-      <button id="loginBtn" class="w-full py-2.5 bg-nl-pink text-white text-sm font-semibold rounded-lg hover:bg-nl-pinkDark transition-colors" onclick="attemptLogin()">
-        Login
-      </button>
+      <p id="loginError" class="text-xs text-red-400 mb-3 hidden" data-i18n="login.invalid">Invalid access key.</p>
+      <button id="loginBtn" class="w-full py-2.5 bg-nl-pink text-white text-sm font-semibold rounded-lg hover:bg-nl-pinkDark transition-colors" onclick="attemptLogin()" data-i18n="login.button">Login</button>
       <p class="text-center mt-4">
-          <a href="#" id="unlockKeyLink" class="text-xs text-nl-pinkLight hover:text-nl-pink underline underline-offset-2 transition-colors">
-              Unlock a key
-          </a>
+        <a href="#" id="unlockKeyLink" class="text-xs text-nl-pinkLight hover:text-nl-pink underline underline-offset-2 transition-colors" data-i18n="login.unlockKey" onclick="openTutorialInApp()">Unlock a key</a>
       </p>
     </div>
   </div>
@@ -87,7 +111,7 @@
 
 <div class="title-bar fixed top-0 left-0 right-0 h-9 bg-nl-surface backdrop-blur-xl flex items-center justify-between z-[215] border-b border-nl-border shadow-lg shadow-black/30" ondblclick="maximizeApp()">
   <div class="flex items-center gap-3 pl-4">
-    <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" class="w-5 h-5">
+    <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" class="w-5 h-5" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22%3E%3Crect width=%2220%22 height=%2220%22 fill=%22%23e84393%22 rx=%224%22/%3E%3C/svg%3E'">
     <span class="text-xs font-semibold text-nl-pinkLight tracking-wider uppercase">Nightlight</span>
   </div>
   <div class="flex items-center h-full">
@@ -102,7 +126,7 @@
     <div class="p-5 border-b border-nl-border">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-nl-pinkMuted flex items-center justify-center pulse-glow">
-          <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" class="w-7 h-7">
+          <img src="https://github.com/onajlikezz/Nightlight-Game-Launcher/blob/main/img/logonl.png?raw=true" class="w-7 h-7" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 28 28%22%3E%3Crect width=%2228%22 height=%2228%22 fill=%22%23e84393%22 rx=%226%22/%3E%3Ctext x=%2214%22 y=%2219%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2214%22%3EN%3C/text%3E%3C/svg%3E'">
         </div>
         <div>
           <h1 class="text-sm font-bold">Nightlight</h1>
@@ -111,24 +135,27 @@
       </div>
     </div>
     <nav class="flex-1 py-4 px-2 space-y-1">
-        <p class="text-[10px] font-semibold text-nl-textMuted uppercase tracking-widest px-3 mb-3">Main</p>
-        <button class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="accounts" onclick="switchTab('accounts')">
-            <i data-lucide="gamepad-2" class="w-4 h-4"></i> Accounts
-        </button>
-        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="bypass" onclick="switchTab('bypass')">
-            <i data-lucide="shield" class="w-4 h-4"></i> Bypass
-        </button>
+      <p class="text-[10px] font-semibold text-nl-textMuted uppercase tracking-widest px-3 mb-3" data-i18n="nav.main">Main</p>
+      <button class="nav-item active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="accounts" onclick="switchTab('accounts')">
+        <i data-lucide="gamepad-2" class="w-4 h-4"></i> <span data-i18n="nav.accounts">Accounts</span>
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="bypass" onclick="switchTab('bypass')">
+        <i data-lucide="shield" class="w-4 h-4"></i> <span data-i18n="nav.bypass">Bypass</span>
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" data-tab="settings" onclick="switchTab('settings')">
+        <i data-lucide="settings" class="w-4 h-4"></i> <span data-i18n="nav.settings">Settings</span>
+      </button>
 
-        <p class="text-[10px] font-semibold text-nl-textMuted uppercase tracking-widest px-3 mt-6 mb-3">Socials</p>
-        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://www.youtube.com/@onajjlikezz')">
-            <i data-lucide="circle-play" class="w-4 h-4"></i> YouTube
-        </button>
-        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://discord.gg/yXeWQ6arcq')">
-            <i data-lucide="message-circle" class="w-4 h-4"></i> Discord
-        </button>
-        <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://github.com/onajlikezz/')">
-            <i data-lucide="folders" class="w-4 h-4"></i> GitHub
-        </button>
+      <p class="text-[10px] font-semibold text-nl-textMuted uppercase tracking-widest px-3 mt-6 mb-3" data-i18n="nav.socials">Socials</p>
+      <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://www.youtube.com/@onajjlikezz')">
+        <i data-lucide="circle-play" class="w-4 h-4"></i> YouTube
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://discord.gg/yXeWQ6arcq')">
+        <i data-lucide="message-circle" class="w-4 h-4"></i> Discord
+      </button>
+      <button class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium" onclick="openSocialLink('https://github.com/onajlikezz/')">
+        <i data-lucide="folders" class="w-4 h-4"></i> GitHub
+      </button>
     </nav>
   </aside>
 
@@ -137,14 +164,14 @@
     <div class="tab-content active" id="tab-accounts">
       <div class="px-8 pb-8 mt-6">
         <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-2"><div class="w-1 h-5 bg-nl-pink rounded-full"></div><h3 class="text-lg font-bold">Available Games</h3></div>
-          <button onclick="refreshAccounts()" class="px-3 py-1.5 bg-nl-card border border-nl-border rounded-lg text-xs hover:border-nl-borderActive flex items-center gap-2"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh</button>
+          <div class="flex items-center gap-2"><div class="w-1 h-5 bg-nl-pink rounded-full"></div><h3 class="text-lg font-bold" data-i18n="accounts.title">Available Games</h3></div>
+          <button onclick="refreshAccounts()" class="px-3 py-1.5 bg-nl-card border border-nl-border rounded-lg text-xs hover:border-nl-borderActive flex items-center gap-2"><i data-lucide="refresh-cw" class="w-3 h-3"></i> <span data-i18n="accounts.refresh">Refresh</span></button>
         </div>
         <div class="mb-4">
-          <input type="text" id="accounts-search-input" placeholder="Search games..." class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-2.5 text-sm text-nl-text placeholder-nl-textMuted focus:outline-none focus:border-nl-pink/50" oninput="filterAccounts()">
+          <input type="text" id="accounts-search-input" placeholder="Search games..." data-i18n-placeholder="accounts.search" class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-2.5 text-sm text-nl-text placeholder-nl-textMuted focus:outline-none focus:border-nl-pink/50" oninput="filterAccounts()">
         </div>
         <div id="accounts-container" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <p class="col-span-full text-center text-nl-textMuted py-8">Loading games...</p>
+          <p class="col-span-full text-center text-nl-textMuted py-8" data-i18n="accounts.loading">Loading games...</p>
         </div>
       </div>
     </div>
@@ -153,75 +180,84 @@
     <div class="tab-content" id="tab-bypass">
       <div class="px-8 py-8">
         <div class="flex justify-between items-center mb-6">
-          <div><h2 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="shield" class="text-nl-pink"></i> Bypass Panel</h2><p class="text-xs text-nl-textMuted mt-1">Click a game to manage bypass</p></div>
+          <div><h2 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="shield" class="text-nl-pink"></i> <span data-i18n="bypass.title">Bypass List</span></h2><p class="text-xs text-nl-textMuted mt-1">Click a game to manage bypass</p></div>
         </div>
         <div class="mb-4">
-          <input type="text" id="bypass-search-input" placeholder="Search games..." class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-2.5 text-sm text-nl-text placeholder-nl-textMuted focus:outline-none focus:border-nl-pink/50" oninput="filterBypass()">
+          <input type="text" id="bypass-search-input" placeholder="Search bypass..." data-i18n-placeholder="bypass.search" class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-2.5 text-sm text-nl-text placeholder-nl-textMuted focus:outline-none focus:border-nl-pink/50" oninput="filterBypass()">
         </div>
         <div id="bypass-games-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <p class="col-span-full text-center text-nl-textMuted py-8">Loading bypass games...</p>
+          <p class="col-span-full text-center text-nl-textMuted py-8" data-i18n="bypass.loading">Loading bypass...</p>
         </div>
       </div>
     </div>
 
-    <!-- BYPASS DETAIL TAB (revert removed) -->
+    <!-- SETTINGS TAB -->
+    <div class="tab-content" id="tab-settings">
+      <div class="px-8 py-8">
+        <h2 class="text-2xl font-bold mb-6" data-i18n="settings.title">Settings</h2>
+        <div class="bg-nl-surface border border-nl-border rounded-2xl p-6 max-w-md">
+          <h3 class="text-sm font-semibold text-nl-pinkLight mb-3" data-i18n="settings.language.title">Language</h3>
+          <p class="text-xs text-nl-textMuted mb-4" data-i18n="settings.language.description">Select your preferred language</p>
+          <select id="language-select" class="w-full bg-nl-card border border-nl-border rounded-lg px-4 py-2.5 text-sm text-nl-text focus:outline-none focus:border-nl-pink/50" onchange="changeLanguage(this.value)">
+            <option value="en" data-i18n="language.en">English</option>
+            <option value="es" data-i18n="language.es">Spanish</option>
+            <option value="in" data-i18n="language.in">Indian (Hindi)</option>
+            <option value="rs" data-i18n="language.rs">Serbian</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- BYPASS DETAIL TAB (FIXED) -->
     <div class="tab-content" id="tab-bypass-detail">
       <div class="px-8 py-8">
         <button onclick="goBackToBypassList()" class="flex items-center gap-2 text-nl-textMuted hover:text-nl-pink mb-6">
-          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Bypass List
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> <span data-i18n="bypassDetail.backToList">Back to Bypass List</span>
         </button>
         <div class="animate-fade-up">
           <div class="flex flex-col lg:flex-row gap-8 pb-24">
-            <!-- left column: banner + Steam info -->
             <div class="w-full lg:w-1/2">
-              <img id="bypass-detail-banner" src="" class="w-full rounded-2xl border border-nl-border shadow-2xl mb-6">
+              <img id="bypass-detail-banner" src="" class="w-full rounded-2xl border border-nl-border shadow-2xl mb-6 aspect-[16/7.5] object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 460 215%22%3E%3Crect fill=%22%231a111c%22 width=%22460%22 height=%22215%22/%3E%3Ctext x=%22230%22 y=%22115%22 text-anchor=%22middle%22 fill=%22%238a7590%22%3EImage unavailable%3C/text%3E%3C/svg%3E'; this.classList.add('img-fallback');">
               <div class="grid grid-cols-2 gap-3">
                 <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
-                  <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Release Date</span>
+                  <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1" data-i18n="detail.releaseDate">Release Date</span>
                   <span id="bypass-detail-date" class="font-semibold text-sm"></span>
                 </div>
                 <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
-                  <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Metacritic</span>
+                  <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1" data-i18n="detail.metacritic">Metacritic</span>
                   <span id="bypass-detail-metacritic" class="font-semibold text-sm"></span>
                 </div>
                 <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
-                  <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Developer</span>
+                  <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1" data-i18n="detail.developer">Developer</span>
                   <span id="bypass-detail-developer" class="font-semibold text-sm"></span>
                 </div>
                 <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
-                  <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Publisher</span>
+                  <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1" data-i18n="detail.publisher">Publisher</span>
                   <span id="bypass-detail-publisher" class="font-semibold text-sm"></span>
                 </div>
               </div>
               <div class="mt-4">
-                <h4 class="text-sm font-semibold text-nl-pinkLight mb-3">Description</h4>
+                <h4 class="text-sm font-semibold text-nl-pinkLight mb-3" data-i18n="detail.description">Description</h4>
                 <p id="bypass-detail-description" class="text-xs text-nl-text leading-relaxed"></p>
               </div>
               <div class="mt-4">
-                <h4 class="text-sm font-semibold text-nl-pinkLight mb-3">Categories / Genres</h4>
+                <h4 class="text-sm font-semibold text-nl-pinkLight mb-3" data-i18n="detail.categoriesGenres">Categories / Genres</h4>
                 <div id="bypass-detail-categories-genres" class="flex flex-wrap gap-2"></div>
               </div>
             </div>
-            <!-- right column: path + actions -->
             <div class="w-full lg:w-1/2">
               <h2 id="bypass-detail-title" class="text-3xl font-bold mb-2"></h2>
               <p id="bypass-detail-status" class="text-sm uppercase tracking-wider mb-4"></p>
-
-              <!-- Path field with folder browse -->
               <div class="mb-4">
-                <label class="text-xs font-medium text-nl-textMuted uppercase tracking-wider mb-2 block">Game Path</label>
+                <label class="text-xs font-medium text-nl-textMuted uppercase tracking-wider mb-2 block" data-i18n="bypassDetail.gamePath">Game Path</label>
                 <div class="flex gap-2">
-                  <input type="text" id="bypass-path-input" class="flex-1 bg-nl-card border border-nl-border rounded-lg px-4 py-3 text-sm text-nl-text placeholder-nl-textMuted focus:outline-none focus:border-nl-pink/50" placeholder="Not set">
+                  <input type="text" id="bypass-path-input" class="flex-1 bg-nl-card border border-nl-border rounded-lg px-4 py-3 text-sm text-nl-text placeholder-nl-textMuted focus:outline-none focus:border-nl-pink/50" placeholder="Not set" data-i18n-placeholder="bypassDetail.notSet">
                   <button onclick="selectFolder()" class="px-4 py-3 bg-nl-card border border-nl-border rounded-lg hover:border-nl-pink transition-colors" title="Browse">
                     <i data-lucide="folder" class="w-5 h-5 text-nl-pinkLight"></i>
                   </button>
                 </div>
               </div>
-
-              <!-- Action buttons (no revert) -->
               <div id="bypass-detail-actions" class="flex flex-wrap gap-3 mb-6"></div>
-
-              <!-- Progress bar -->
               <div id="bypass-detail-progress" class="hidden p-5 bg-nl-card border border-nl-pink/20 rounded-2xl mb-6">
                 <div class="flex items-center justify-between mb-3">
                   <p id="bypass-progress-text" class="text-xs text-nl-pinkLight font-mono tracking-wide">Initializing...</p>
@@ -237,64 +273,60 @@
       </div>
     </div>
 
-    <!-- GAME DETAILS TAB (for Accounts) -->
+    <!-- GAME DETAILS TAB (Accounts) FIXED -->
     <div class="tab-content" id="tab-game-details">
       <div class="px-8 py-8 relative" style="min-height: calc(100vh - 36px);">
         <button onclick="switchTab('accounts')" class="flex items-center gap-2 text-nl-textMuted hover:text-nl-pink mb-6 transition-colors">
-          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Games
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> <span data-i18n="gameDetail.backToGames">Back to Games</span>
         </button>
         <div class="flex flex-col lg:flex-row gap-8 animate-fade-up pb-24">
           <div class="w-full lg:w-1/2 flex flex-col gap-6">
-            <img id="detail-banner" src="" class="w-full rounded-2xl border border-nl-border shadow-2xl">
+            <img id="detail-banner" src="" class="w-full rounded-2xl border border-nl-border shadow-2xl aspect-[16/7.5] object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 460 215%22%3E%3Crect fill=%22%231a111c%22 width=%22460%22 height=%22215%22/%3E%3Ctext x=%22230%22 y=%22115%22 text-anchor=%22middle%22 fill=%22%238a7590%22%3EImage unavailable%3C/text%3E%3C/svg%3E'; this.classList.add('img-fallback');">
             <div class="grid grid-cols-2 gap-3">
               <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
-                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Release Date</span>
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1" data-i18n="detail.releaseDate">Release Date</span>
                 <span id="detail-date" class="font-semibold text-sm"></span>
               </div>
               <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
-                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Metacritic</span>
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1" data-i18n="detail.metacritic">Metacritic</span>
                 <span id="detail-metacritic" class="font-semibold text-sm"></span>
               </div>
               <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
-                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Developer</span>
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1" data-i18n="detail.developer">Developer</span>
                 <span id="detail-developer" class="font-semibold text-sm"></span>
               </div>
               <div class="bg-nl-card p-3 rounded-xl border border-nl-border">
-                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1">Publisher</span>
+                <span class="text-[10px] uppercase tracking-widest text-nl-textMuted block mb-1" data-i18n="detail.publisher">Publisher</span>
                 <span id="detail-publisher" class="font-semibold text-sm"></span>
               </div>
             </div>
           </div>
-
           <div class="w-full lg:w-1/2">
             <h2 id="detail-title" class="text-3xl font-extrabold mb-2"></h2>
             <p id="detail-appid" class="text-nl-pink font-mono text-sm mb-4"></p>
             <p id="detail-description" class="text-nl-textMuted leading-relaxed mb-6"></p>
-
             <div class="flex flex-wrap gap-2 mb-6" id="detail-categories-genres"></div>
-
             <div class="mb-6">
-              <h4 class="text-sm font-semibold text-nl-pinkLight mb-3">System Requirements</h4>
+              <h4 class="text-sm font-semibold text-nl-pinkLight mb-3" data-i18n="detail.systemRequirements">System Requirements</h4>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-nl-card p-4 rounded-xl border border-nl-border">
-                  <h5 class="text-xs font-semibold uppercase tracking-wider text-nl-textMuted mb-2">Minimum</h5>
+                  <h5 class="text-xs font-semibold uppercase tracking-wider text-nl-textMuted mb-2" data-i18n="detail.minimum">Minimum</h5>
                   <div id="req-min-content" class="text-xs text-nl-text leading-relaxed max-h-40 overflow-y-auto"></div>
                 </div>
                 <div class="bg-nl-card p-4 rounded-xl border border-nl-border">
-                  <h5 class="text-xs font-semibold uppercase tracking-wider text-nl-textMuted mb-2">Recommended</h5>
+                  <h5 class="text-xs font-semibold uppercase tracking-wider text-nl-textMuted mb-2" data-i18n="detail.recommended">Recommended</h5>
                   <div id="req-rec-content" class="text-xs text-nl-text leading-relaxed max-h-40 overflow-y-auto"></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
         <div class="fixed bottom-0 left-60 right-0 bg-nl-surface/95 backdrop-blur-xl border-t border-nl-border p-4 flex gap-4 z-50">
           <button id="detail-login-btn" onclick="loginWithCurrentGame()" class="flex-1 py-4 bg-nl-pink text-white rounded-xl font-bold hover:scale-[1.02] transition-transform shadow-lg shadow-nl-pink/20">
-            Login with Random Account
+            <span data-i18n="gameDetail.loginWithRandomAccount">Login with Random Account</span>
           </button>
           <button id="detail-bypass-btn" onclick="switchToBypassAndScroll()" class="flex-1 py-4 bg-nl-card border border-nl-border rounded-xl font-bold hover:border-nl-pink transition-all flex items-center justify-center">
-            Inject Bypass
+            <span data-i18n="gameDetail.injectBypass">Inject Bypass</span>
           </button>
         </div>
       </div>
@@ -302,29 +334,43 @@
   </main>
 </div>
 
+<!-- Tutorial overlay -->
+<div id="tutorial-overlay" class="fixed inset-0 z-[300] hidden flex-col">
+  <div class="bg-nl-surface h-10 flex items-center px-4 border-b border-nl-border">
+    <button onclick="closeTutorial()" class="text-nl-pinkLight hover:text-nl-pink flex items-center gap-2 text-sm font-medium">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> <span data-i18n="bypassDetail.backToList">Back</span>
+    </button>
+  </div>
+  <iframe id="tutorial-iframe" class="flex-1 border-0" src="about:blank"></iframe>
+</div>
+
 <!-- Update Required Modal -->
-<div id="update-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[300] hidden flex items-center justify-center modal-overlay">
+<div id="update-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[400] hidden flex items-center justify-center modal-overlay">
   <div class="bg-nl-surface border border-nl-pink p-6 rounded-2xl w-[480px] animate-float-in shadow-2xl">
     <div class="flex items-center gap-3 mb-4">
       <i data-lucide="alert-triangle" class="w-7 h-7 text-yellow-400"></i>
-      <h3 class="text-xl font-bold text-nl-pinkLight">Update Required</h3>
+      <h3 class="text-xl font-bold text-nl-pinkLight" data-i18n="updateModal.title">Update Required</h3>
     </div>
-    <p class="text-sm text-nl-text leading-relaxed mb-2">
+    <p class="text-sm text-nl-text leading-relaxed mb-2" data-i18n="updateModal.message">
       In order to use Nightlight Launcher you need to update to the latest version.
     </p>
     <div class="bg-nl-card p-3 rounded-xl border border-nl-border my-4">
-      <p class="text-xs text-nl-textMuted">Your version: <span id="current-version-display" class="font-mono text-nl-pink"></span></p>
-      <p class="text-xs text-nl-textMuted">Latest version: <span id="latest-version-display" class="font-mono text-green-400"></span></p>
+      <p class="text-xs text-nl-textMuted">
+        <span data-i18n="updateModal.yourVersion">Your version:</span> <span id="current-version-display" class="font-mono text-nl-pink"></span>
+      </p>
+      <p class="text-xs text-nl-textMuted">
+        <span data-i18n="updateModal.latestVersion">Latest version:</span> <span id="latest-version-display" class="font-mono text-green-400"></span>
+      </p>
     </div>
     <p class="text-xs text-nl-textMuted mb-6">
       Please download the new release from GitHub and install it to continue using the launcher.
     </p>
     <div class="flex gap-3">
       <button id="update-now-btn" class="flex-1 py-2.5 bg-nl-pink text-white rounded-lg font-bold hover:bg-nl-pinkDark transition-colors flex items-center justify-center gap-2">
-        <i data-lucide="download" class="w-4 h-4"></i> Download Now
+        <i data-lucide="download" class="w-4 h-4"></i> <span data-i18n="updateModal.downloadNow">Download Now</span>
       </button>
       <button id="update-exit-btn" class="flex-1 py-2.5 bg-nl-card border border-nl-border rounded-lg font-bold hover:bg-red-500/20 hover:border-red-500 transition-colors">
-        Remind Later
+        <span data-i18n="updateModal.remindLater">Remind Later</span>
       </button>
     </div>
   </div>
@@ -335,15 +381,13 @@
   <div class="bg-nl-surface border border-nl-border p-6 rounded-2xl w-[420px] animate-float-in">
     <div class="flex items-center gap-3 mb-4">
       <i data-lucide="alert-triangle" class="w-6 h-6 text-yellow-400"></i>
-      <h3 class="text-lg font-bold">Warning</h3>
+      <h3 class="text-lg font-bold" data-i18n="bypassDetail.warningTitle">Warning</h3>
     </div>
-    <p class="text-sm text-nl-textMuted mb-6 leading-relaxed">
-      This bypass was reported to not working.<br>
-      You can download and try it but we can't guarantee that it will work.
+    <p class="text-sm text-nl-textMuted mb-6 leading-relaxed" data-i18n="bypassDetail.warningNotWorking">
+      This bypass was reported to not work.<br>
+      You can try it but we can't guarantee success.
     </p>
-    <button onclick="closeBypassWarning()" class="w-full py-2.5 bg-nl-pink text-white rounded-lg font-bold hover:bg-nl-pinkDark transition-colors">
-      OK
-    </button>
+    <button onclick="closeBypassWarning()" class="w-full py-2.5 bg-nl-pink text-white rounded-lg font-bold hover:bg-nl-pinkDark transition-colors" data-i18n="bypassDetail.warningOK">OK</button>
   </div>
 </div>
 
@@ -352,19 +396,14 @@
   <div class="bg-nl-surface border border-nl-border p-6 rounded-2xl w-[420px] animate-float-in">
     <div class="flex items-center gap-3 mb-4">
       <i data-lucide="shield-alert" class="w-6 h-6 text-yellow-400"></i>
-      <h3 class="text-lg font-bold">Security Exclusion Required</h3>
+      <h3 class="text-lg font-bold" data-i18n="bypassDetail.securityExclusionTitle">Security Exclusion Required</h3>
     </div>
-    <p class="text-sm text-nl-textMuted mb-6 leading-relaxed">
-      This bypass requires you to add the game folder to Windows Security exclusions.<br>
-      Use the button below to open Windows Security and add the exclusion.
+    <p class="text-sm text-nl-textMuted mb-6 leading-relaxed" data-i18n="bypassDetail.warningSecurityExclusion">
+      ⚠️ This bypass requires adding the game folder to Windows Security exclusions.
     </p>
     <div class="flex gap-3">
-      <button onclick="openWindowsSecurity()" class="flex-1 py-2.5 bg-nl-pink text-white rounded-lg font-bold hover:bg-nl-pinkDark transition-colors">
-        Open Windows Security
-      </button>
-      <button onclick="closeSecurityExclusiveModal()" class="flex-1 py-2.5 bg-nl-card border border-nl-border rounded-lg font-bold">
-        OK
-      </button>
+      <button onclick="openWindowsSecurity()" class="flex-1 py-2.5 bg-nl-pink text-white rounded-lg font-bold hover:bg-nl-pinkDark transition-colors" data-i18n="bypassDetail.openWindowsSecurity">Open Windows Security</button>
+      <button onclick="closeSecurityExclusiveModal()" class="flex-1 py-2.5 bg-nl-card border border-nl-border rounded-lg font-bold" data-i18n="bypassDetail.securityExclusionOK">OK</button>
     </div>
   </div>
 </div>
@@ -375,104 +414,122 @@
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
 const path = require('path');
+
 let CURRENT_VERSION;
+let steamGameData = {};
+let gameStatuses = {};
+let bypassGames = [];
+let currentBypassGameName = null;
+let gameList = [];
+let currentDetailGame = null;
 let bypassLoading = false;
 
-// ── Faster Steam data fetching (batch request) ──
+// ── Language & i18n ──
+let currentLocaleData = {};
+
+async function loadLocaleData(lang) {
+  try {
+    const data = await ipcRenderer.invoke('get-locale-data', lang);
+    currentLocaleData = data;
+    applyTranslations();
+    const select = document.getElementById('language-select');
+    if (select) select.value = lang;
+    lucide.createIcons();
+  } catch (e) {
+    console.error('Failed to load locale', e);
+  }
+}
+
+function t(pathStr) {
+  const keys = pathStr.split('.');
+  let obj = currentLocaleData;
+  for (const key of keys) {
+    if (obj && obj[key] !== undefined) obj = obj[key];
+    else return undefined;
+  }
+  return obj;
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const translation = t(key);
+    // Only update if we got a valid string (ignore undefined/null)
+    if (translation !== undefined && translation !== null) {
+      // Skip dynamic content containers (descriptions, requirements, categories)
+      if (el.id === 'detail-description' || el.id === 'bypass-detail-description' ||
+          el.id === 'req-min-content' || el.id === 'req-rec-content' ||
+          el.id === 'bypass-detail-categories-genres' || el.id === 'detail-categories-genres') {
+        return;
+      }
+      if (el.tagName === 'INPUT' && el.type === 'text') {
+        el.placeholder = translation;
+      } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        // ignore
+      } else {
+        el.textContent = translation;
+      }
+    }
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    const translation = t(key);
+    if (translation !== undefined && translation !== null) {
+      el.placeholder = translation;
+    }
+  });
+}
+
+async function changeLanguage(lang) {
+  await ipcRenderer.invoke('set-language', lang);
+  await loadLocaleData(lang);
+  showToast(t('toasts.languageChanged').replace('{language}', t('language.'+lang) || lang), 'success');
+}
+
+// ── In‑app tutorial ──
+function openTutorialInApp() {
+  document.getElementById('tutorial-overlay').classList.remove('hidden');
+  document.getElementById('tutorial-iframe').src = 'https://onajlikezz.github.io/tutorialforkey/';
+}
+function closeTutorial() {
+  document.getElementById('tutorial-overlay').classList.add('hidden');
+  document.getElementById('tutorial-iframe').src = 'about:blank';
+}
+
+// ── Steam data fetch ──
 async function fetchSteamDataForIds(ids) {
   if (!ids.length) return;
-  // Ensure we don’t re‑fetch data we already have
   const missingIds = ids.filter(id => !steamGameData[String(id)]);
   if (missingIds.length === 0) return;
-
-  console.log(`Fetching Steam data for ${missingIds.length} game(s):`, missingIds);
-
   try {
     const url = `https://store.steampowered.com/api/appdetails?appids=${missingIds.join(',')}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Steam API error: ${res.status}`);
     const json = await res.json();
     for (const [id, data] of Object.entries(json)) {
-      if (data && data.success) {
-        steamGameData[String(id)] = data.data;   // force string key
-      }
+      if (data && data.success) steamGameData[String(id)] = data.data;
     }
   } catch (e) {
     console.error('Steam batch fetch failed:', e);
   }
 }
 
-// ── Scroll to bypass – fixed to use Steam App ID ──
-function switchToBypassAndScroll() {
-  if (!currentDetailGame) return;
-  const appId = currentDetailGame.steam_appid;
-  switchTab('bypass');
-  setTimeout(() => {
-    const elem = document.getElementById(`bypass-${appId}`);
-    if (elem) {
-      elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      elem.classList.add('pulse-glow');
-      setTimeout(() => elem.classList.remove('pulse-glow'), 1500);
-    }
-  }, 200);
+// ── Tab switching ──
+function switchTab(tabName) {
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  const navItem = document.querySelector(`[data-tab="${tabName}"]`);
+  if (navItem) navItem.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+  const target = document.getElementById(`tab-${tabName}`);
+  if (target) target.classList.add('active');
+  if (tabName === 'bypass' && bypassGames.length) renderBypassCards();
+  lucide.createIcons();
+  applyTranslations();
 }
 
-// ── Login with current game – skip report when shouldReport === false ──
-async function loginWithCurrentGame() {
-  if (!currentDetailGame) return;
-  const gameId = currentDetailGame.steam_appid;
-  const gameName = currentDetailGame.name;
-  
-  let attempts = 0;
-  const maxAttempts = 5;
-  let success = false;
-  
-  showToast(`Attempting to get working account for ${gameName}...`, 'info', 2000);
-  
-  while (attempts < maxAttempts && !success) {
-    attempts++;
-    try {
-      const creds = await ipcRenderer.invoke('get-game-credentials', gameId);
-      if (!creds.username || !creds.password) throw new Error('Invalid credentials');
-      showToast(`Testing account ${creds.username} (attempt ${attempts}/${maxAttempts})...`, 'info', 3000);
-      
-      const test = await ipcRenderer.invoke('test-steam-login', creds.username, creds.password);
-      if (test.success) {
-        const launch = await ipcRenderer.invoke('steam-login', creds.username, creds.password);
-      if (launch.success) {
-        showToast(`Launching Steam as ${creds.username}...`, 'success');
-      } else {
-        showToast(`Failed to send login: ${launch.error}`, 'error');
-      }
-      } else {
-        showToast(`Account ${creds.username} invalid: ${test.error}. Trying another...`, 'error', 3000);
-        // Only report if shouldReport is not explicitly false
-        if (test.shouldReport !== false) {
-          try {
-            const reportKey = await ipcRenderer.invoke('get-saved-key');
-            if (reportKey) {
-              ipcRenderer.invoke('report-invalid-account', { username: creds.username, key: reportKey });
-            }
-          } catch(e) {
-            console.error('Failed to report invalid account:', e);
-          }
-        }
-      }
-    } catch (err) {
-      showToast(`Error: ${err.message}`, 'error');
-    }
-    if (!success && attempts < maxAttempts) {
-      await new Promise(r => setTimeout(r, 1500));
-    }
-  }
-  if (!success) {
-    showToast(`Failed to find a working account after ${maxAttempts} attempts.`, 'error');
-  }
-}
-
-// ── Load app data (uses batch fetch for speed) ──
+// ── Load app data ──
 async function loadAppData() {
-  bypassLoading = true;                                    // ←
+  bypassLoading = true;
   try {
     bypassGames = await ipcRenderer.invoke('get-bypass-data');
   } catch(e) {
@@ -486,7 +543,6 @@ async function loadAppData() {
   const allIds = [...new Set([...bypassIds, ...gameIdsFromAPI])];
   await fetchSteamDataForIds(allIds);
 
-  // Load custom paths
   gameStatuses = {};
   try {
     const savedPaths = await ipcRenderer.invoke('get-custom-paths');
@@ -500,11 +556,8 @@ async function loadAppData() {
         gameStatuses[id] = { installed: false, path: '' };
       }
     }
-  } catch(e) {
-    console.error('Failed to load saved paths', e);
-  }
+  } catch(e) { console.error('Failed to load saved paths', e); }
 
-  // Auto‑detect
   try {
     const autoPaths = await ipcRenderer.invoke('get-auto-game-paths');
     for (const game of bypassGames) {
@@ -516,130 +569,26 @@ async function loadAppData() {
         }
       }
     }
-  } catch(e) {
-    console.error('Auto‑detection failed:', e);
-  }
+  } catch(e) { console.error('Auto-detection failed:', e); }
 
   await renderAccountsFromAPI();
   renderBypassCards();
   bypassLoading = false;
 }
 
-document.querySelector('.title-bar').addEventListener('dblclick', (e) => {
-  if (!e.target.closest('button')) maximizeApp();
-});
-
-async function openSocialLink(url) {
-  await ipcRenderer.invoke('open-external-link', url);
-}
-
-const KEY_URL_TXT = 'https://raw.githubusercontent.com/onajlikezz/Nightlight-Game-Launcher/refs/heads/main/keyaccesslink.txt';
-let unlockKeyUrl;
-
-async function fetchUnlockKeyUrl() {
-  const res = await fetch(KEY_URL_TXT);
-  if (res.ok) {
-    const text = (await res.text()).trim();
-    if (text) unlockKeyUrl = text;
-  }
-  document.getElementById('unlockKeyLink').onclick = () => openSocialLink(unlockKeyUrl);
-}
-
-// ---------- Semantic version comparison ----------
-function parseVersion(str) {
-  const match = str.match(/\d+(?:\.\d+)*/);
-  if (!match) return [0];
-  return match[0].split('.').map(Number);
-}
-
-function compareVersions(v1, v2) {
-  const parts1 = parseVersion(v1);
-  const parts2 = parseVersion(v2);
-  const maxLen = Math.max(parts1.length, parts2.length);
-  for (let i = 0; i < maxLen; i++) {
-    const num1 = i < parts1.length ? parts1[i] : 0;
-    const num2 = i < parts2.length ? parts2[i] : 0;
-    if (num1 !== num2) return num1 < num2 ? -1 : 1;
-  }
-  return 0;
-}
-
-async function checkForUpdatesAndPrompt() {
-  const updateUrl = "https://api.github.com/repos/onajlikezz/Nightlight-Game-Launcher/releases/latest";
-  try {
-    const response = await fetch(updateUrl, {
-      headers: {
-        'User-Agent': 'Nightlight-Launcher/1.0 (Windows)'
-      }
-    });
-    if (!response.ok) throw new Error("Failed to reach GitHub API");
-    const data = await response.json();
-    let latestTag = data.tag_name;
-    // Strip "NLLauncherV"/"NLLauncherv" prefix
-    let latestVersionStr = latestTag;
-    if (latestVersionStr.startsWith('NLLauncherV') || latestVersionStr.startsWith('NLLauncherv')) {
-      latestVersionStr = latestVersionStr.replace(/^NLLauncher[Vv]/, '');
-    } else if (latestVersionStr.startsWith('v') || latestVersionStr.startsWith('V')) {
-      latestVersionStr = latestVersionStr.substring(1);
-    }
-    const isNewer = compareVersions(latestVersionStr, CURRENT_VERSION) > 0;
-    if (isNewer) {
-      const modal = document.getElementById('update-modal');
-      document.getElementById('current-version-display').textContent = CURRENT_VERSION;
-      document.getElementById('latest-version-display').textContent = latestVersionStr;
-      modal.classList.remove('hidden');
-      modal.classList.add('show');
-      lucide.createIcons();
-
-      // Replace buttons to avoid duplicate listeners
-      const updateBtn = document.getElementById('update-now-btn');
-      const exitBtn = document.getElementById('update-exit-btn');
-      const newUpdateBtn = updateBtn.cloneNode(true);
-      const newExitBtn = exitBtn.cloneNode(true);
-      updateBtn.parentNode.replaceChild(newUpdateBtn, updateBtn);
-      exitBtn.parentNode.replaceChild(newExitBtn, exitBtn);
-      newUpdateBtn.addEventListener('click', () => {
-        ipcRenderer.invoke('open-external-link', 'https://github.com/onajlikezz/Nightlight-Game-Launcher/releases');
-      });
-      newExitBtn.addEventListener('click', () => {
-        const modal = document.getElementById('update-modal');
-        modal.classList.add('hidden');
-        modal.classList.remove('show');
-      });
-      return true;
-    }
-    return false;
-  } catch (error) {
-    console.error("Update check failed:", error);
-    return false;
-  }
-}
-
-let steamGameData = {};
-let gameStatuses = {};
-let bypassGames = [];
-let currentBypassGameName = null;
-
-// Game list from API
-let gameList = [];
-let currentDetailGame = null;
-
-// Fetch game list from API
 async function fetchGameList() {
   try {
-    const games = await ipcRenderer.invoke('get-game-list');
-    gameList = games;
-    return true;
+    gameList = await ipcRenderer.invoke('get-game-list');
   } catch(e) {
     showToast('Failed to load game list', 'error');
-    return false;
   }
 }
 
+// ── Render accounts ──
 async function renderAccountsFromAPI() {
   const container = document.getElementById('accounts-container');
   if (!gameList.length) {
-    container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">No games found.</p>';
+    container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">'+t('accounts.loading')+'</p>';
     return;
   }
   container.innerHTML = '';
@@ -649,25 +598,18 @@ async function renderAccountsFromAPI() {
     card.setAttribute('onclick', `openGameDetail('${game.id}')`);
     card.innerHTML = `
       <div class="relative aspect-[16/7.5] rounded-t-xl overflow-hidden">
-        <img src="${game.image}" alt="${game.name}" class="w-full h-full object-cover">
+        <img src="${game.image}" alt="${game.name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 460 215%22%3E%3Crect fill=%22%231a111c%22 width=%22460%22 height=%22215%22/%3E%3Ctext x=%22230%22 y=%22115%22 text-anchor=%22middle%22 fill=%22%238a7590%22%3EImage unavailable%3C/text%3E%3C/svg%3E'; this.classList.add('img-fallback');">
       </div>
       <div class="p-3">
         <h4 class="text-sm font-semibold truncate mb-1.5">${game.name}</h4>
         <div class="flex items-center gap-1.5">
-          <span class="text-[10px] text-nl-textMuted font-medium uppercase tracking-tighter">
-            ${game.release_date || 'Release TBA'}
-          </span>
+          <span class="text-[10px] text-nl-textMuted font-medium uppercase tracking-tighter">${game.release_date || 'Release TBA'}</span>
         </div>
       </div>`;
     container.appendChild(card);
   }
   lucide.createIcons();
   filterAccounts();
-}
-
-async function refreshAccounts() {
-  await fetchGameList();
-  await renderAccountsFromAPI();
 }
 
 function filterAccounts() {
@@ -679,78 +621,18 @@ function filterAccounts() {
   });
 }
 
-function filterBypass() {
-  const term = document.getElementById('bypass-search-input')?.value.toLowerCase();
-  if (!term) return;
-  const cards = document.querySelectorAll('#bypass-games-container > .game-card');
-  cards.forEach(card => {
-    const name = card.querySelector('h4')?.textContent.toLowerCase() || '';
-    card.style.display = name.includes(term) ? '' : 'none';
-  });
+async function refreshAccounts() {
+  await fetchGameList();
+  await renderAccountsFromAPI();
 }
 
-async function openGameDetail(gameId) {
-  if (!steamGameData[gameId]) {
-    await fetchSteamDataForIds([gameId]);
-  }
-  const game = steamGameData[gameId];
-  if (!game) {
-    showToast('Could not load game details', 'error');
-    return;
-  }
-  currentDetailGame = game;
-  document.getElementById('detail-title').textContent = game.name;
-  document.getElementById('detail-banner').src = game.header_image;
-  document.getElementById('detail-appid').textContent = `STEAM ID: ${game.steam_appid}`;
-  document.getElementById('detail-description').textContent = game.short_description || 'No description available.';
-  document.getElementById('detail-date').textContent = game.release_date?.date || 'TBA';
-  const mcScore = game.metacritic ? `${game.metacritic.score} (Meta)` : 'N/A';
-  document.getElementById('detail-metacritic').textContent = mcScore;
-  document.getElementById('detail-developer').textContent = game.developers?.join(', ') || 'Unknown';
-  document.getElementById('detail-publisher').textContent = game.publishers?.join(', ') || 'Unknown';
-  const badgesContainer = document.getElementById('detail-categories-genres');
-  let badgesHTML = '';
-  if (game.categories) {
-    game.categories.forEach(cat => {
-      badgesHTML += `<span class="inline-block px-2 py-1 text-[10px] font-medium rounded-full bg-nl-pinkMuted text-nl-pinkLight border border-nl-pink/20">${cat.description}</span>`;
-    });
-  }
-  if (game.genres) {
-    game.genres.forEach(gen => {
-      badgesHTML += `<span class="inline-block px-2 py-1 text-[10px] font-medium rounded-full bg-nl-card border border-nl-border text-nl-text">${gen.description}</span>`;
-    });
-  }
-  badgesContainer.innerHTML = badgesHTML || '<span class="text-xs text-nl-textMuted">No categories</span>';
-  const reqMinDiv = document.getElementById('req-min-content');
-  const reqRecDiv = document.getElementById('req-rec-content');
-  if (game.pc_requirements) {
-    reqMinDiv.innerHTML = game.pc_requirements.minimum || 'No minimum requirements listed.';
-    reqRecDiv.innerHTML = game.pc_requirements.recommended || 'No recommended requirements listed.';
-  } else {
-    reqMinDiv.innerHTML = 'N/A';
-    reqRecDiv.innerHTML = 'N/A';
-  }
-  const bypassBtn = document.getElementById('detail-bypass-btn');
-  if (bypassBtn) {
-    if (bypassGames.some(g => g.steamAppId == game.steam_appid)) {
-      bypassBtn.style.display = 'flex';
-    } else {
-      bypassBtn.style.display = 'none';
-    }
-  }
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-game-details').classList.add('active');
-  lucide.createIcons();
-}
-
+// ── Render bypass cards ──
 function renderBypassCards() {
   const container = document.getElementById('bypass-games-container');
-
-  if (bypassLoading) {                                     // ← new block
-    container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">Loading bypass games…</p>';
+  if (bypassLoading) {
+    container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">'+t('bypass.loading')+'</p>';
     return;
   }
-
   if (!bypassGames.length) {
     container.innerHTML = '<p class="col-span-full text-center text-nl-textMuted py-8">No bypass games loaded.</p>';
     return;
@@ -765,14 +647,14 @@ function renderBypassCards() {
     return `
       <div id="bypass-${id}" class="game-card rounded-xl bg-nl-card border border-nl-border cursor-pointer" onclick="openBypassDetail(${id})">
         <div class="relative aspect-[16/7.5] rounded-t-xl overflow-hidden">
-          <img src="${coverImage}" alt="${name}" class="w-full h-full object-cover">
+          <img src="${coverImage}" alt="${name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 460 215%22%3E%3Crect fill=%22%231a111c%22 width=%22460%22 height=%22215%22/%3E%3Ctext x=%22230%22 y=%22115%22 text-anchor=%22middle%22 fill=%22%238a7590%22%3EImage unavailable%3C/text%3E%3C/svg%3E'; this.classList.add('img-fallback');">
         </div>
         <div class="p-3">
           <h4 class="text-sm font-semibold truncate mb-1.5">${name}</h4>
           <div class="flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 ${installed ? 'bg-green-500' : 'bg-nl-textMuted'} rounded-full"></span>
             <span class="text-[10px] ${installed ? 'text-green-400' : 'text-nl-textMuted'} font-medium uppercase tracking-tighter">
-              ${installed ? (status.isCustom ? 'Custom Path' : 'Auto‑detected') : 'Path not specified'}
+              ${installed ? (status.isCustom ? t('bypassDetail.statusCustomPath') : t('bypassDetail.statusAutoDetected')) : t('bypassDetail.statusNotSet')}
             </span>
           </div>
         </div>
@@ -782,15 +664,64 @@ function renderBypassCards() {
   filterBypass();
 }
 
+function filterBypass() {
+  const term = document.getElementById('bypass-search-input')?.value.toLowerCase();
+  if (!term) return;
+  const cards = document.querySelectorAll('#bypass-games-container > .game-card');
+  cards.forEach(card => {
+    const name = card.querySelector('h4')?.textContent.toLowerCase() || '';
+    card.style.display = name.includes(term) ? '' : 'none';
+  });
+}
+
+// ── Game detail (Accounts) ──
+async function openGameDetail(gameId) {
+  if (!steamGameData[gameId]) await fetchSteamDataForIds([gameId]);
+  const game = steamGameData[gameId];
+  if (!game) {
+    showToast('Could not load game details', 'error');
+    return;
+  }
+  currentDetailGame = game;
+  document.getElementById('detail-title').textContent = game.name;
+  document.getElementById('detail-banner').src = game.header_image;
+  document.getElementById('detail-appid').textContent = t('detail.steamId') + ' ' + game.steam_appid;
+  document.getElementById('detail-description').textContent = game.short_description || t('detail.noDescription');
+  document.getElementById('detail-date').textContent = game.release_date?.date || 'TBA';
+  const mcScore = game.metacritic ? `${game.metacritic.score} (Meta)` : 'N/A';
+  document.getElementById('detail-metacritic').textContent = mcScore;
+  document.getElementById('detail-developer').textContent = game.developers?.join(', ') || 'Unknown';
+  document.getElementById('detail-publisher').textContent = game.publishers?.join(', ') || 'Unknown';
+  const badgesContainer = document.getElementById('detail-categories-genres');
+  let badgesHTML = '';
+  if (game.categories) game.categories.forEach(c => badgesHTML += `<span class="inline-block px-2 py-1 text-[10px] font-medium rounded-full bg-nl-pinkMuted text-nl-pinkLight border border-nl-pink/20">${c.description}</span>`);
+  if (game.genres) game.genres.forEach(g => badgesHTML += `<span class="inline-block px-2 py-1 text-[10px] font-medium rounded-full bg-nl-card border border-nl-border text-nl-text">${g.description}</span>`);
+  badgesContainer.innerHTML = badgesHTML || `<span class="text-xs text-nl-textMuted">${t('detail.noCategories')}</span>`;
+  const reqMinDiv = document.getElementById('req-min-content');
+  const reqRecDiv = document.getElementById('req-rec-content');
+  if (game.pc_requirements) {
+    reqMinDiv.innerHTML = game.pc_requirements.minimum || t('detail.noMinRequirements');
+    reqRecDiv.innerHTML = game.pc_requirements.recommended || t('detail.noRecRequirements');
+  } else {
+    reqMinDiv.textContent = t('detail.noMinRequirements');
+    reqRecDiv.textContent = t('detail.noRecRequirements');
+  }
+  const bypassBtn = document.getElementById('detail-bypass-btn');
+  if (bypassBtn) {
+    bypassBtn.style.display = bypassGames.some(g => g.steamAppId == game.steam_appid) ? 'flex' : 'none';
+  }
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-game-details').classList.add('active');
+  lucide.createIcons();
+}
+
+// ── Bypass detail ──
 async function openBypassDetail(steamAppId) {
   const game = bypassGames.find(g => g.steamAppId == steamAppId);
   if (!game) return;
   currentBypassGameName = steamAppId;
   const id = String(steamAppId);
-
-  // 🆕 Load Steam data if missing
   if (!steamGameData[id]) {
-    // Show a temporary “loading” state in the UI
     document.getElementById('bypass-detail-title').textContent = game.name || `Steam App ${id}`;
     document.getElementById('bypass-detail-banner').src = `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${id}/header.jpg`;
     document.getElementById('bypass-detail-date').textContent = 'Loading…';
@@ -799,152 +730,113 @@ async function openBypassDetail(steamAppId) {
     document.getElementById('bypass-detail-publisher').textContent = 'Loading…';
     document.getElementById('bypass-detail-description').textContent = 'Fetching game details…';
     document.getElementById('bypass-detail-categories-genres').innerHTML = '';
-    // Also disable action buttons until we have a path
     document.getElementById('bypass-detail-actions').innerHTML = '';
-
-    // Switch to the detail tab immediately so the user sees the loading state
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById('tab-bypass-detail').classList.add('active');
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     document.querySelector('[data-tab="bypass"]').classList.add('active');
     lucide.createIcons();
-
-    // Fetch the missing data
     await fetchSteamDataForIds([id]);
   }
-
-  // Now proceed with the normal rendering (data should be available)
   const gameInfo = steamGameData[id] || {};
   const status = gameStatuses[id] || { installed: false, path: '' };
   const pathValue = status.path || '';
   const installed = status.installed;
-
   document.getElementById('bypass-detail-banner').src = gameInfo.header_image || `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${id}/header.jpg`;
   document.getElementById('bypass-detail-title').textContent = game.name || gameInfo.name || `Steam App ${id}`;
   document.getElementById('bypass-detail-date').textContent = gameInfo.release_date?.date || 'TBA';
   document.getElementById('bypass-detail-metacritic').textContent = gameInfo.metacritic ? `${gameInfo.metacritic.score} (Meta)` : 'N/A';
   document.getElementById('bypass-detail-developer').textContent = gameInfo.developers?.join(', ') || 'Unknown';
   document.getElementById('bypass-detail-publisher').textContent = gameInfo.publishers?.join(', ') || 'Unknown';
-  document.getElementById('bypass-detail-description').textContent = gameInfo.short_description || 'No description available.';
-
+  document.getElementById('bypass-detail-description').textContent = gameInfo.short_description || t('detail.noDescription');
   const badgesDiv = document.getElementById('bypass-detail-categories-genres');
   let badgesHTML = '';
   if (gameInfo.categories) gameInfo.categories.forEach(c => badgesHTML += `<span class="inline-block px-2 py-1 text-[10px] rounded-full bg-nl-pinkMuted text-nl-pinkLight border border-nl-pink/20">${c.description}</span>`);
   if (gameInfo.genres) gameInfo.genres.forEach(g => badgesHTML += `<span class="inline-block px-2 py-1 text-[10px] rounded-full bg-nl-card border border-nl-border text-nl-text">${g.description}</span>`);
-  badgesDiv.innerHTML = badgesHTML || '<span class="text-xs text-nl-textMuted">No categories</span>';
-
+  badgesDiv.innerHTML = badgesHTML || `<span class="text-xs text-nl-textMuted">${t('detail.noCategories')}</span>`;
   const statusEl = document.getElementById('bypass-detail-status');
   if (installed) {
-    if (status.isCustom) {
-      statusEl.innerHTML = '<span class="text-green-400">● Custom Path</span>';
-    } else {
-      statusEl.innerHTML = '<span class="text-green-400">● Auto‑detected</span>';
-    }
+    statusEl.textContent = status.isCustom ? t('bypassDetail.statusCustomPath') : t('bypassDetail.statusAutoDetected');
   } else {
-    statusEl.innerHTML = '<span class="text-nl-textMuted">● Path not specified</span>';
+    statusEl.textContent = t('bypassDetail.statusNotSet');
   }
-
   const pathInput = document.getElementById('bypass-path-input');
   pathInput.value = pathValue;
   pathInput.readOnly = false;
-
-  // Rebuild action buttons (same as before)
   const actionsDiv = document.getElementById('bypass-detail-actions');
   const hasPath = pathValue.trim() !== '';
   const disabledAttr = hasPath ? '' : 'disabled';
-
   let actionsHTML = '';
   if (game.SecurityExclusive === 'true' || game.securityExclusive === true) {
     actionsHTML += `
       <div class="w-full bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 mb-3 flex flex-col gap-2">
-        <p class="text-xs text-yellow-400">⚠️ This bypass requires adding the game folder to Windows Security exclusions.</p>
+        <p class="text-xs text-yellow-400">${t('bypassDetail.warningSecurityExclusion')}</p>
         <button onclick="openWindowsSecurity()" class="self-start px-4 py-1.5 bg-yellow-500/20 border border-yellow-500/40 text-yellow-400 rounded-lg text-sm font-semibold hover:bg-yellow-500 hover:text-white transition-all">
-          Open Windows Security
+          ${t('bypassDetail.openWindowsSecurity')}
         </button>
       </div>`;
   }
-
   actionsHTML += `
     <button onclick="launchBypassGame(${id}, '${hasPath ? pathValue.replace(/\\/g, '\\\\') : ''}', '${game.launchExe || game.exeName}')"
       class="px-5 py-2.5 bg-green-500/20 border border-green-500/40 text-green-400 rounded-xl font-semibold hover:bg-green-500 hover:text-white transition-all flex items-center gap-2 ${hasPath ? '' : 'opacity-50 cursor-not-allowed'}"
       ${disabledAttr}>
-      <i data-lucide="play" class="w-4 h-4 fill-current"></i> Launch
+      <i data-lucide="play" class="w-4 h-4 fill-current"></i> ${t('bypassDetail.launch')}
     </button>
     <button onclick="openGameFolder('${hasPath ? pathValue.replace(/\\/g, '\\\\') : '#'}')"
       class="px-5 py-2.5 bg-nl-pinkMuted border border-nl-pink/30 text-nl-pinkLight rounded-xl font-semibold hover:bg-nl-pink hover:text-white transition-all flex items-center gap-2 ${hasPath ? '' : 'opacity-50 cursor-not-allowed'}"
       ${disabledAttr}>
-      <i data-lucide="folder" class="w-4 h-4"></i> Open Folder
+      <i data-lucide="folder" class="w-4 h-4"></i> ${t('bypassDetail.openFolder')}
     </button>`;
-
   const markerPath = hasPath ? path.join(pathValue, 'bypass_applied.txt') : null;
   const isApplied = markerPath && fs.existsSync(markerPath);
-
   if (!isApplied) {
     actionsHTML += `
       <button onclick="injectBypassFromDetail(${id}, '${hasPath ? pathValue.replace(/\\/g, '\\\\') : ''}')"
         class="px-5 py-2.5 bg-nl-pink text-white rounded-xl font-bold hover:scale-105 transition-transform shadow-lg flex items-center gap-2 ${hasPath ? '' : 'opacity-50 cursor-not-allowed'}"
         ${disabledAttr}>
-        <i data-lucide="download" class="w-4 h-4"></i> Inject
+        <i data-lucide="download" class="w-4 h-4"></i> ${t('bypassDetail.inject')}
       </button>`;
   } else {
     actionsHTML += `
       <button onclick="verifyBypassFromDetail(${id}, '${hasPath ? pathValue.replace(/\\/g, '\\\\') : ''}')"
         class="px-5 py-2.5 bg-nl-pinkMuted border border-nl-pink/30 text-nl-pink rounded-xl font-semibold hover:bg-nl-pink hover:text-white transition-all flex items-center gap-2 ${hasPath ? '' : 'opacity-50 cursor-not-allowed'}"
         ${disabledAttr}>
-        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Verify
+        <i data-lucide="refresh-cw" class="w-4 h-4"></i> ${t('bypassDetail.verify')}
       </button>`;
   }
-
   actionsDiv.innerHTML = actionsHTML;
   lucide.createIcons();
-
-  if (game.working === 'false') {
-    showBypassWarning();
-  }
-
-  // Switch to detail tab (if not already there)
+  if (game.working === 'false') showBypassWarning();
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-bypass-detail').classList.add('active');
   document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
   document.querySelector('[data-tab="bypass"]').classList.add('active');
 }
 
+// ── Select folder ──
 async function selectFolder() {
   const folder = await ipcRenderer.invoke('select-folder');
   if (!folder) return;
-  
   const id = currentBypassGameName;
   const game = bypassGames.find(g => g.steamAppId == id);
   if (!game) return;
-
-  // Check if this folder is already assigned to another game
-  const normalizedFolder = folder.toLowerCase().replace(/\\$/, ''); // normalize for comparison
+  const normalizedFolder = folder.toLowerCase().replace(/\\$/, '');
   for (const [otherId, otherStatus] of Object.entries(gameStatuses)) {
-    if (otherId == id) continue; // skip current game
+    if (otherId == id) continue;
     if (otherStatus.installed && otherStatus.path) {
       const otherPath = otherStatus.path.toLowerCase().replace(/\\$/, '');
       if (otherPath === normalizedFolder) {
-        showToast('This folder is already assigned to another game. Please choose a different folder.', 'error');
+        showToast(t('toasts.folderAlreadyAssigned'), 'error');
         return;
       }
     }
   }
-
-  // Save the path
   const gameNameKey = game.name || String(id);
   await ipcRenderer.invoke('set-game-path', { gameName: gameNameKey, customPath: folder });
-
   gameStatuses[id] = { installed: true, path: folder, isCustom: true };
-
   const exeToCheck = game.launchExe || game.exeName;
   const exeExists = exeToCheck ? fs.existsSync(path.join(folder, exeToCheck)) : false;
-
-  if (exeExists) {
-    showToast('✅ This location has game files in it', 'success');
-  } else {
-    showToast('⚠️ This location might be wrong', 'warning');
-  }
-
+  showToast(exeExists ? t('toasts.gameFilesFound') : t('toasts.gameFilesWrong'), exeExists ? 'success' : 'warning');
   renderBypassCards();
   openBypassDetail(id);
 }
@@ -952,54 +844,38 @@ async function selectFolder() {
 document.getElementById('bypass-path-input').addEventListener('blur', async function() {
   const newPath = this.value.trim();
   if (!newPath || !currentBypassGameName) return;
-  
   const game = bypassGames.find(g => g.steamAppId == currentBypassGameName);
   if (!game) return;
-
-  // Normalize for comparison
   const normalizedNewPath = newPath.toLowerCase().replace(/\\$/, '');
   for (const [otherId, otherStatus] of Object.entries(gameStatuses)) {
     if (otherId == currentBypassGameName) continue;
     if (otherStatus.installed && otherStatus.path) {
       const otherPath = otherStatus.path.toLowerCase().replace(/\\$/, '');
       if (otherPath === normalizedNewPath) {
-        showToast('This folder is already assigned to another game. Please choose a different folder.', 'error');
-        // Reset the input to the previous value
+        showToast(t('toasts.folderAlreadyAssigned'), 'error');
         const oldStatus = gameStatuses[currentBypassGameName] || {};
         document.getElementById('bypass-path-input').value = oldStatus.path || '';
         return;
       }
     }
   }
-
-  // Save the path
   await ipcRenderer.invoke('set-game-path', { gameName: game.name || String(game.steamAppId), customPath: newPath });
-  
   gameStatuses[currentBypassGameName] = { installed: true, path: newPath, isCustom: true };
-
   const exeToCheck = game.launchExe || game.exeName;
   const exeExists = exeToCheck ? fs.existsSync(path.join(newPath, exeToCheck)) : false;
-  if (exeExists) {
-    showToast('✅ This location has game files in it', 'success');
-  } else {
-    showToast('⚠️ This location might be wrong', 'warning');
-  }
-
+  showToast(exeExists ? t('toasts.gameFilesFound') : t('toasts.gameFilesWrong'), exeExists ? 'success' : 'warning');
   renderBypassCards();
   openBypassDetail(currentBypassGameName);
 });
 
 async function launchBypassGame(steamAppId, gamePath, launchExe) {
   if (!gamePath || gamePath === '#') {
-    showToast('No game path set.', 'error');
+    showToast(t('toasts.pathEmpty'), 'error');
     return;
   }
   const res = await ipcRenderer.invoke('launch-game-exe', { gamePath, exeName: launchExe });
-  if (!res.success) {
-    showToast(`Launch failed: ${res.error}`, 'error');
-  } else {
-    showToast('Game launched!', 'success');
-  }
+  if (!res.success) showToast(t('bypassDetail.launchFailed').replace('{error}', res.error), 'error');
+  else showToast(t('bypassDetail.gameLaunched'), 'success');
 }
 
 function openWindowsSecurity() {
@@ -1007,26 +883,19 @@ function openWindowsSecurity() {
 }
 
 function closeSecurityExclusiveModal() {
-  const modal = document.getElementById('security-exclusive-modal');
-  modal.classList.add('hidden');
-  modal.classList.remove('show');
+  document.getElementById('security-exclusive-modal').classList.add('hidden');
 }
 
 function goBackToBypassList() {
-  currentBypassGameName = null;
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-bypass').classList.add('active');
-  renderBypassCards();
+  switchTab('bypass');
 }
 
 async function openGameFolder(gamePath) {
   await ipcRenderer.invoke('open-folder', gamePath);
 }
 
-// ---- Bypass progress functions ----
 function showProgress(containerId) {
-  const container = document.getElementById(containerId);
-  container.classList.remove('hidden');
+  document.getElementById(containerId).classList.remove('hidden');
   document.getElementById('bypass-progress-bar').style.width = '0%';
   document.getElementById('bypass-progress-text').textContent = 'Initializing...';
   document.getElementById('bypass-progress-percent').textContent = '0%';
@@ -1055,11 +924,8 @@ async function injectBypassFromDetail(steamAppId, gamePath) {
   const handler = setupProgressHandler();
   try {
     const res = await ipcRenderer.invoke('start-bypass', { steamAppId, gamePath });
-    if (res.success) {
-      showToast('Bypass applied!', 'success');
-    } else {
-      showToast(`Bypass failed: ${res.error}`, 'error');
-    }
+    if (res.success) showToast(t('bypassDetail.bypassApplied'), 'success');
+    else showToast(t('bypassDetail.bypassFailed').replace('{error}', res.error), 'error');
   } catch(e) {
     showToast(`Error: ${e.message}`, 'error');
   } finally {
@@ -1074,11 +940,8 @@ async function verifyBypassFromDetail(steamAppId, gamePath) {
   const handler = setupProgressHandler();
   try {
     const res = await ipcRenderer.invoke('verify-bypass', { steamAppId, gamePath });
-    if (res.success) {
-      showToast('Verification complete!', 'success');
-    } else {
-      showToast(`Verification failed: ${res.error}`, 'error');
-    }
+    if (res.success) showToast('Verification complete!', 'success');
+    else showToast(`Verification failed: ${res.error}`, 'error');
   } catch(e) {
     showToast(`Error: ${e.message}`, 'error');
   } finally {
@@ -1088,14 +951,53 @@ async function verifyBypassFromDetail(steamAppId, gamePath) {
   }
 }
 
-function switchTab(tabName) {
-  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-  const navItem = document.querySelector(`[data-tab="${tabName}"]`);
-  if (navItem) navItem.classList.add('active');
-  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.getElementById(`tab-${tabName}`).classList.add('active');
-  if (tabName === 'bypass') renderBypassCards();
-  lucide.createIcons();
+function switchToBypassAndScroll() {
+  if (!currentDetailGame) return;
+  const appId = currentDetailGame.steam_appid;
+  switchTab('bypass');
+  setTimeout(() => {
+    const elem = document.getElementById(`bypass-${appId}`);
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      elem.classList.add('pulse-glow');
+      setTimeout(() => elem.classList.remove('pulse-glow'), 1500);
+    }
+  }, 200);
+}
+
+async function loginWithCurrentGame() {
+  if (!currentDetailGame) return;
+  const gameId = currentDetailGame.steam_appid;
+  const gameName = currentDetailGame.name;
+  let attempts = 0;
+  const maxAttempts = 5;
+  let success = false;
+  showToast(`Attempting to get working account for ${gameName}...`, 'info', 2000);
+  while (attempts < maxAttempts && !success) {
+    attempts++;
+    try {
+      const creds = await ipcRenderer.invoke('get-game-credentials', gameId);
+      if (!creds.username || !creds.password) throw new Error('Invalid credentials');
+      showToast(`Testing account ${creds.username} (attempt ${attempts}/${maxAttempts})...`, 'info', 3000);
+      const test = await ipcRenderer.invoke('test-steam-login', creds.username, creds.password);
+      if (test.success) {
+        success = true;
+        const launch = await ipcRenderer.invoke('steam-login', creds.username, creds.password);
+        if (launch.success) showToast(`Launching Steam as ${creds.username}...`, 'success');
+        else showToast(`Failed to send login: ${launch.error}`, 'error');
+      } else {
+        showToast(`Account ${creds.username} invalid: ${test.error}. Trying another...`, 'error', 3000);
+        if (test.shouldReport !== false) {
+          try {
+            const reportKey = await ipcRenderer.invoke('get-saved-key');
+            if (reportKey) ipcRenderer.invoke('report-invalid-account', { username: creds.username, key: reportKey });
+          } catch(e) { console.error('Failed to report invalid account:', e); }
+        }
+      }
+    } catch(err) { showToast(`Error: ${err.message}`, 'error'); }
+    if (!success && attempts < maxAttempts) await new Promise(r => setTimeout(r, 1500));
+  }
+  if (!success) showToast(t('toasts.noAccountsFound').replace('{attempts}', maxAttempts), 'error');
 }
 
 async function attemptLogin() {
@@ -1112,16 +1014,16 @@ async function attemptLogin() {
       await ipcRenderer.invoke('save-key', key);
       loadAppData();
       document.getElementById('loginOverlay').classList.add('fade-out');
-      showToast('Login successful!', 'success');
+      showToast(t('toasts.loginSuccessful'), 'success');
     } else {
-      errorEl.textContent = "Invalid access key.";
+      errorEl.textContent = t('login.invalid');
       errorEl.classList.remove('hidden');
     }
   } catch(e) {
-    errorEl.textContent = "Network error.";
+    errorEl.textContent = t('login.networkError');
     errorEl.classList.remove('hidden');
   } finally {
-    btn.textContent = "Login";
+    btn.textContent = t('login.button') || 'Login';
   }
 }
 
@@ -1129,21 +1031,19 @@ async function autoLogin() {
   try {
     const savedKey = await ipcRenderer.invoke('get-saved-key');
     if (!savedKey) {
-      document.getElementById('loginMessage').textContent = "Enter your access key to continue";
+      document.getElementById('loginMessage').textContent = t('login.enterKey');
       return;
     }
     const isValid = await ipcRenderer.invoke('validate-access-key', savedKey);
     if (isValid) {
       document.getElementById('loginOverlay').classList.add('fade-out');
-      showToast('Welcome back!', 'success');
+      showToast(t('toasts.welcomeBack'), 'success');
       await loadAppData();
     } else {
       document.getElementById('loginMessage').textContent = "Your saved key is no longer valid. Enter a new key.";
-      showToast("Saved key invalid. Please obtain a new key.", "error");
+      showToast(t('toasts.savedKeyInvalid'), 'error');
     }
-  } catch(e) {
-    console.error('Auto-login error', e);
-  }
+  } catch(e) { console.error('Auto-login error', e); }
 }
 
 function showToast(message, type='info', duration = 3000) {
@@ -1153,7 +1053,8 @@ function showToast(message, type='info', duration = 3000) {
   const icons = { success:'check-circle', error:'alert-circle', info:'info', warning:'alert-triangle' };
   toast.className = `toast flex items-center gap-3 px-4 py-3 rounded-xl border ${colors[type]} backdrop-blur-xl shadow-2xl min-w-[280px]`;
   toast.innerHTML = `<i data-lucide="${icons[type]}" class="w-4 h-4 ${type==='error'?'text-red-400':type==='warning'?'text-yellow-400':'text-nl-pink'} shrink-0"></i><span class="text-sm font-medium text-nl-text">${message}</span>`;
-  container.appendChild(toast); lucide.createIcons();
+  container.appendChild(toast);
+  lucide.createIcons();
   setTimeout(() => { toast.classList.add('toast-exit'); setTimeout(() => toast.remove(),300); }, duration);
 }
 
@@ -1174,21 +1075,73 @@ function closeApp() { ipcRenderer.send('close-app'); }
 function minimizeApp() { ipcRenderer.send('minimize-app'); }
 function maximizeApp() { ipcRenderer.send('maximize-app'); }
 
-document.addEventListener('keydown', (e) => {
-  if (e.key==="F12"||(e.ctrlKey&&e.shiftKey&&e.key==="I")||(e.ctrlKey&&e.key==="U")) {
-    e.preventDefault();
-    return false;
+async function openSocialLink(url) {
+  await ipcRenderer.invoke('open-external-link', url);
+}
+
+function parseVersion(str) {
+  const match = str.match(/\d+(?:\.\d+)*/);
+  return match ? match[0].split('.').map(Number) : [0];
+}
+function compareVersions(v1, v2) {
+  const a = parseVersion(v1), b = parseVersion(v2);
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const na = a[i] || 0, nb = b[i] || 0;
+    if (na !== nb) return na < nb ? -1 : 1;
   }
-});
-document.addEventListener('contextmenu', (e) => e.preventDefault());
+  return 0;
+}
+async function checkForUpdatesAndPrompt() {
+  const updateUrl = "https://api.github.com/repos/onajlikezz/Nightlight-Game-Launcher/releases/latest";
+  try {
+    const response = await fetch(updateUrl, { headers: { 'User-Agent': 'Nightlight-Launcher/1.0' } });
+    if (!response.ok) return false;
+    const data = await response.json();
+    let latestVersionStr = data.tag_name;
+    if (latestVersionStr.startsWith('NLLauncherV') || latestVersionStr.startsWith('NLLauncherv')) {
+      latestVersionStr = latestVersionStr.replace(/^NLLauncher[Vv]/, '');
+    } else if (latestVersionStr.startsWith('v') || latestVersionStr.startsWith('V')) {
+      latestVersionStr = latestVersionStr.substring(1);
+    }
+    if (compareVersions(latestVersionStr, CURRENT_VERSION) > 0) {
+      document.getElementById('current-version-display').textContent = CURRENT_VERSION;
+      document.getElementById('latest-version-display').textContent = latestVersionStr;
+      const modal = document.getElementById('update-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('show');
+      const updateBtn = document.getElementById('update-now-btn');
+      const exitBtn = document.getElementById('update-exit-btn');
+      const newUpdateBtn = updateBtn.cloneNode(true), newExitBtn = exitBtn.cloneNode(true);
+      updateBtn.parentNode.replaceChild(newUpdateBtn, updateBtn);
+      exitBtn.parentNode.replaceChild(newExitBtn, exitBtn);
+      newUpdateBtn.addEventListener('click', () => {
+        ipcRenderer.invoke('open-external-link', 'https://github.com/onajlikezz/Nightlight-Game-Launcher/releases');
+      });
+      newExitBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+      });
+      lucide.createIcons();
+      return true;
+    }
+    return false;
+  } catch (e) { console.error("Update check failed:", e); return false; }
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
   lucide.createIcons();
-
   CURRENT_VERSION = await ipcRenderer.invoke('get-app-version');
-  const updateNeeded = await checkForUpdatesAndPrompt();
-
+  await checkForUpdatesAndPrompt();
+  try {
+    const lang = await ipcRenderer.invoke('get-language');
+    if (lang && ['en','es','in','rs'].includes(lang)) await loadLocaleData(lang);
+    else await loadLocaleData('en');
+  } catch { await loadLocaleData('en'); }
   autoLogin();
-  fetchUnlockKeyUrl();
+  document.addEventListener('keydown', (e) => {
+    if (e.key==="F12"||(e.ctrlKey&&e.shiftKey&&e.key==="I")||(e.ctrlKey&&e.key==="U")) e.preventDefault();
+  });
+  document.addEventListener('contextmenu', e => e.preventDefault());
 });
 </script>
 </body>

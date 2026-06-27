@@ -1,0 +1,109 @@
+{
+  "login": {
+    "accessKey": "Access Key",
+    "button": "Login",
+    "unlockKey": "Unlock a key",
+    "enterKey": "Enter your access key to continue",
+    "invalid": "Invalid access key.",
+    "networkError": "Network error."
+  },
+  "nav": {
+    "main": "Main",
+    "accounts": "Accounts",
+    "bypass": "Bypass",
+    "settings": "Settings",
+    "socials": "Socials"
+  },
+  "accounts": {
+    "title": "Available Games",
+    "refresh": "Refresh",
+    "search": "Search games...",
+    "loading": "Loading games..."
+  },
+  "bypass": {
+    "title": "Bypass List",
+    "search": "Search bypass...",
+    "loading": "Loading bypass..."
+  },
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "title": "Language",
+      "description": "Select your preferred language"
+    }
+  },
+  "language": {
+    "en": "English",
+    "es": "Spanish",
+    "in": "Indian (Hindi)",
+    "rs": "Serbian"
+  },
+  "common": {
+    "loading": "Loading games..."
+  },
+  "detail": {
+    "releaseDate": "Release Date",
+    "metacritic": "Metacritic",
+    "developer": "Developer",
+    "publisher": "Publisher",
+    "description": "Description",
+    "categoriesGenres": "Categories / Genres",
+    "systemRequirements": "System Requirements",
+    "minimum": "Minimum",
+    "recommended": "Recommended",
+    "noDescription": "No description available.",
+    "noCategories": "No categories",
+    "noMinRequirements": "No minimum requirements listed.",
+    "noRecRequirements": "No recommended requirements listed.",
+    "steamId": "Steam ID:"
+  },
+  "bypassDetail": {
+    "backToList": "Back to Bypass List",
+    "gamePath": "Game Path",
+    "notSet": "Not set",
+    "browse": "Browse",
+    "launch": "Launch",
+    "openFolder": "Open Folder",
+    "inject": "Inject",
+    "verify": "Verify",
+    "statusInstalled": "● Installed",
+    "statusCustomPath": "● Custom Path",
+    "statusAutoDetected": "● Auto‑detected",
+    "statusNotSet": "● Path not specified",
+    "warningTitle": "Warning",
+    "warningNotWorking": "This bypass was reported to not work.\nYou can try it but we can't guarantee success.",
+    "warningOK": "OK",
+    "securityExclusionTitle": "Security Exclusion Required",
+    "warningSecurityExclusion": "⚠️ This bypass requires adding the game folder to Windows Security exclusions.",
+    "openWindowsSecurity": "Open Windows Security",
+    "securityExclusionOK": "OK",
+    "bypassApplied": "Bypass applied!",
+    "bypassFailed": "Bypass failed: {error}",
+    "launchFailed": "Launch failed: {error}",
+    "gameLaunched": "Game launched!"
+  },
+  "gameDetail": {
+    "backToGames": "Back to Games",
+    "loginWithRandomAccount": "Login with Random Account",
+    "injectBypass": "Inject Bypass"
+  },
+  "updateModal": {
+    "title": "Update Required",
+    "message": "In order to use Nightlight Launcher you need to update to the latest version.",
+    "yourVersion": "Your version:",
+    "latestVersion": "Latest version:",
+    "downloadNow": "Download Now",
+    "remindLater": "Remind Later"
+  },
+  "toasts": {
+    "welcomeBack": "Welcome back!",
+    "loginSuccessful": "Login successful!",
+    "savedKeyInvalid": "Saved key invalid. Please obtain a new key.",
+    "gameFilesFound": "✅ This location has game files in it",
+    "gameFilesWrong": "⚠️ This location might be wrong",
+    "folderAlreadyAssigned": "This folder is already assigned to another game. Please choose a different folder.",
+    "pathEmpty": "No game path set.",
+    "noAccountsFound": "Failed to find a working account after {attempts} attempts.",
+    "languageChanged": "Language changed to {language}"
+  }
+}

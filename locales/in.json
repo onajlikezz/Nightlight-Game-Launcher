@@ -1,0 +1,109 @@
+{
+  "login": {
+    "accessKey": "एक्सेस कुंजी",
+    "button": "लॉग इन करें",
+    "unlockKey": "कुंजी अनलॉक करें",
+    "enterKey": "जारी रखने के लिए अपनी एक्सेस कुंजी दर्ज करें",
+    "invalid": "अमान्य एक्सेस कुंजी।",
+    "networkError": "नेटवर्क त्रुटि।"
+  },
+  "nav": {
+    "main": "मुख्य",
+    "accounts": "खाते",
+    "bypass": "बायपास",
+    "settings": "सेटिंग्स",
+    "socials": "सोशल"
+  },
+  "accounts": {
+    "title": "उपलब्ध गेम",
+    "refresh": "रिफ्रेश",
+    "search": "गेम खोजें...",
+    "loading": "गेम लोड हो रहे हैं..."
+  },
+  "bypass": {
+    "title": "बायपास सूची",
+    "search": "बायपास खोजें...",
+    "loading": "बायपास लोड हो रहा है..."
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "language": {
+      "title": "भाषा",
+      "description": "अपनी पसंदीदा भाषा चुनें"
+    }
+  },
+  "language": {
+    "en": "अंग्रेज़ी",
+    "es": "स्पैनिश",
+    "in": "भारतीय (हिंदी)",
+    "rs": "सर्बियाई"
+  },
+  "common": {
+    "loading": "गेम लोड हो रहे हैं..."
+  },
+  "detail": {
+    "releaseDate": "रिलीज की तारीख",
+    "metacritic": "मेटाक्रिटिक",
+    "developer": "डेवलपर",
+    "publisher": "प्रकाशक",
+    "description": "विवरण",
+    "categoriesGenres": "श्रेणियाँ / शैलियाँ",
+    "systemRequirements": "सिस्टम आवश्यकताएं",
+    "minimum": "न्यूनतम",
+    "recommended": "अनुशंसित",
+    "noDescription": "कोई विवरण उपलब्ध नहीं है।",
+    "noCategories": "कोई श्रेणियाँ नहीं",
+    "noMinRequirements": "कोई न्यूनतम आवश्यकताएँ सूचीबद्ध नहीं हैं।",
+    "noRecRequirements": "कोई अनुशंसित आवश्यकताएँ सूचीबद्ध नहीं हैं।",
+    "steamId": "Steam ID:"
+  },
+  "bypassDetail": {
+    "backToList": "बायपास सूची पर वापस जाएं",
+    "gamePath": "गेम का पथ",
+    "notSet": "सेट नहीं है",
+    "browse": "ब्राउज़ करें",
+    "launch": "लॉन्च करें",
+    "openFolder": "फ़ोल्डर खोलें",
+    "inject": "इंजेक्ट करें",
+    "verify": "सत्यापित करें",
+    "statusInstalled": "● इंस्टॉल्ड",
+    "statusCustomPath": "● कस्टम पथ",
+    "statusAutoDetected": "● ऑटो-डिटेक्टेड",
+    "statusNotSet": "● पथ निर्दिष्ट नहीं है",
+    "warningTitle": "चेतावनी",
+    "warningNotWorking": "यह बायपास काम नहीं करने की सूचना है।\nआप इसे आज़मा सकते हैं लेकिन हम सफलता की गारंटी नहीं दे सकते।",
+    "warningOK": "ठीक",
+    "securityExclusionTitle": "सुरक्षा बहिष्करण आवश्यक",
+    "warningSecurityExclusion": "⚠️ इस बायपास के लिए गेम फ़ोल्डर को Windows सुरक्षा बहिष्करण में जोड़ना आवश्यक है।",
+    "openWindowsSecurity": "Windows सुरक्षा खोलें",
+    "securityExclusionOK": "ठीक",
+    "bypassApplied": "बायपास लागू हो गया!",
+    "bypassFailed": "बायपास विफल: {error}",
+    "launchFailed": "लॉन्च विफल: {error}",
+    "gameLaunched": "गेम लॉन्च हो गया!"
+  },
+  "gameDetail": {
+    "backToGames": "गेम पर वापस जाएं",
+    "loginWithRandomAccount": "यादृच्छिक खाते से लॉगिन करें",
+    "injectBypass": "बायपास इंजेक्ट करें"
+  },
+  "updateModal": {
+    "title": "अपडेट आवश्यक",
+    "message": "Nightlight Launcher का उपयोग करने के लिए आपको नवीनतम संस्करण में अपडेट करना होगा।",
+    "yourVersion": "आपका संस्करण:",
+    "latestVersion": "नवीनतम संस्करण:",
+    "downloadNow": "अभी डाउनलोड करें",
+    "remindLater": "बाद में याद दिलाएं"
+  },
+  "toasts": {
+    "welcomeBack": "वापसी पर स्वागत है!",
+    "loginSuccessful": "लॉगिन सफल!",
+    "savedKeyInvalid": "सहेजी गई कुंजी अमान्य है। कृपया नई कुंजी प्राप्त करें।",
+    "gameFilesFound": "✅ इस स्थान पर गेम फ़ाइलें हैं",
+    "gameFilesWrong": "⚠️ यह स्थान गलत हो सकता है",
+    "folderAlreadyAssigned": "यह फ़ोल्डर पहले से किसी अन्य गेम को असाइन किया गया है। कृपया कोई भिन्न फ़ोल्डर चुनें।",
+    "pathEmpty": "कोई गेम पथ सेट नहीं है।",
+    "noAccountsFound": "{attempts} प्रयासों के बाद भी कोई कार्यशील खाता नहीं मिला।",
+    "languageChanged": "भाषा बदलकर {language} कर दी गई"
+  }
+}

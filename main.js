@@ -1,6 +1,6 @@
 // main.js (with Steam auto‑detection, cross‑platform zip, batching & better error reporting)
 const { app, BrowserWindow, ipcMain, shell, net, dialog } = require('electron');
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
@@ -17,6 +17,7 @@ app.commandLine.appendSwitch('disable-devtools');
 
 let mainWindow;
 let detectedSteamPath = 'C:\\Program Files (x86)\\Steam'; // default fallback (Windows)
+const langFilePath = path.join(app.getPath('userData'), 'language.txt');
 
 // ── Sanitize game name for use in folder names ──────────────────────
 function sanitizeForPath(name) {
@@ -134,9 +135,30 @@ function getSteamInstallPath() {
   return null;
 }
 
+// ── Language persistence ──
+ipcMain.handle('get-language', () => {
+  try {
+    return fs.readFileSync(langFilePath, 'utf8').trim() || 'en';
+  } catch {
+    return 'en';
+  }
+});
+
+ipcMain.handle('set-language', (event, lang) => {
+  fs.writeFileSync(langFilePath, lang, 'utf8');
+  return true;
+});
+
+// ── Load locale JSON from the 'locales' folder ──
+ipcMain.handle('get-locale-data', (event, lang) => {
+  const filePath = path.join(__dirname, 'locales', `${lang}.json`);
+  const raw = fs.readFileSync(filePath, 'utf8');
+  return JSON.parse(raw);
+});
+
 function getSteamLibraryFolders(steamPath) {
   const libraries = [];
-  if (!steamPath) return libraries;                      // ← guard against null
+  if (!steamPath) return libraries;
   if (fs.existsSync(steamPath)) libraries.push(steamPath);
   const vdfPath = path.join(steamPath, 'steamapps', 'libraryfolders.vdf');
   if (!fs.existsSync(vdfPath)) return libraries;
@@ -415,7 +437,7 @@ ipcMain.handle('test-steam-login', async (event, username, password) => {
           errorMsg = 'Steam Guard required (cannot bypass)';
         } else if (errorMsg.includes('AlreadyLoggedInElsewhere') || errorMsg.toLowerCase().includes('already_logged_in')) {
           errorMsg = 'Already logged in elsewhere (valid account)';
-          shouldReport = false;   // ← don't delete this account
+          shouldReport = false;
         }
         resolve({ success: false, error: errorMsg, shouldReport });
       }
@@ -424,13 +446,31 @@ ipcMain.handle('test-steam-login', async (event, username, password) => {
   });
 });
 
-// ── Launch Steam client with credentials (fire‑and‑forget) ────────
+// ── Launch Steam client with credentials ─────────────────────────
 ipcMain.handle('steam-login', async (event, username, password) => {
-  // Use the Steam protocol – works whether Steam is already running or not
+  if (detectedSteamPath) {
+    const steamExe = path.join(detectedSteamPath, 'steam.exe');
+    if (fs.existsSync(steamExe)) {
+      try {
+        if (process.platform === 'win32') {
+          try { execSync('taskkill /F /IM steam.exe /T', { stdio: 'ignore' }); } catch (_) {}
+        } else {
+          try { execSync('pkill -f steam', { stdio: 'ignore' }); } catch (_) {}
+        }
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        const child = spawn(steamExe, ['-login', username, password], {
+          detached: true, stdio: 'ignore', windowsHide: true
+        });
+        child.unref();
+        return { success: true };
+      } catch (err) {
+        console.error('Steam exec launch failed:', err);
+      }
+    }
+  }
   const steamUrl = `steam://login/${encodeURIComponent(username)}/${encodeURIComponent(password)}`;
   try {
     await shell.openExternal(steamUrl);
-    // openExternal returns Promise<void>; if it doesn't throw, the OS was able to handle the protocol
     return { success: true };
   } catch (err) {
     return { success: false, error: err.message };
@@ -501,22 +541,14 @@ ipcMain.handle('select-folder', async () => {
 });
 
 // ── Launch game executable ─────────────────────────────────────────
-ipcMain.handle('launch-game-exe', async (event, { gamePath, exeName, runAsAdmin }) => {
+ipcMain.handle('launch-game-exe', async (event, { gamePath, exeName }) => {
   const exePath = path.join(gamePath, exeName);
   if (!fs.existsSync(exePath)) {
     return { success: false, error: `Executable not found: ${exeName}` };
   }
   try {
-    if (runAsAdmin) {
-      const psCommand = `Start-Process -FilePath '${exePath}' -Verb RunAs`;
-      exec(`powershell -Command "${psCommand}"`, (error) => {
-        if (error) return { success: false, error: error.message };
-      });
-      return { success: true };
-    } else {
-      await shell.openPath(exePath);
-      return { success: true };
-    }
+    await shell.openPath(exePath);
+    return { success: true };
   } catch (e) {
     return { success: false, error: e.message };
   }

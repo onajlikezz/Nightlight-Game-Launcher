@@ -1,0 +1,109 @@
+{
+  "login": {
+    "accessKey": "Clave de acceso",
+    "button": "Iniciar sesión",
+    "unlockKey": "Desbloquear una clave",
+    "enterKey": "Ingrese su clave de acceso para continuar",
+    "invalid": "Clave de acceso no válida.",
+    "networkError": "Error de red."
+  },
+  "nav": {
+    "main": "Principal",
+    "accounts": "Cuentas",
+    "bypass": "Bypass",
+    "settings": "Configuración",
+    "socials": "Redes sociales"
+  },
+  "accounts": {
+    "title": "Juegos disponibles",
+    "refresh": "Actualizar",
+    "search": "Buscar juegos...",
+    "loading": "Cargando juegos..."
+  },
+  "bypass": {
+    "title": "Lista de Bypass",
+    "search": "Buscar bypass...",
+    "loading": "Cargando bypass..."
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": {
+      "title": "Idioma",
+      "description": "Seleccione su idioma preferido"
+    }
+  },
+  "language": {
+    "en": "Inglés",
+    "es": "Español",
+    "in": "Indio (Hindi)",
+    "rs": "Serbio"
+  },
+  "common": {
+    "loading": "Cargando juegos..."
+  },
+  "detail": {
+    "releaseDate": "Fecha de lanzamiento",
+    "metacritic": "Metacritic",
+    "developer": "Desarrollador",
+    "publisher": "Editor",
+    "description": "Descripción",
+    "categoriesGenres": "Categorías / Géneros",
+    "systemRequirements": "Requisitos del sistema",
+    "minimum": "Mínimo",
+    "recommended": "Recomendado",
+    "noDescription": "No hay descripción disponible.",
+    "noCategories": "Sin categorías",
+    "noMinRequirements": "No se enumeran requisitos mínimos.",
+    "noRecRequirements": "No se enumeran requisitos recomendados.",
+    "steamId": "Steam ID:"
+  },
+  "bypassDetail": {
+    "backToList": "Volver a la lista de Bypass",
+    "gamePath": "Ruta del juego",
+    "notSet": "No establecido",
+    "browse": "Examinar",
+    "launch": "Lanzar",
+    "openFolder": "Abrir carpeta",
+    "inject": "Inyectar",
+    "verify": "Verificar",
+    "statusInstalled": "● Instalado",
+    "statusCustomPath": "● Ruta personalizada",
+    "statusAutoDetected": "● Detectado automáticamente",
+    "statusNotSet": "● Ruta no especificada",
+    "warningTitle": "Advertencia",
+    "warningNotWorking": "Se reportó que este bypass no funciona.\nPuedes probarlo pero no garantizamos que funcione.",
+    "warningOK": "OK",
+    "securityExclusionTitle": "Exclusión de seguridad requerida",
+    "warningSecurityExclusion": "⚠️ Este bypass requiere agregar la carpeta del juego a las exclusiones de Seguridad de Windows.",
+    "openWindowsSecurity": "Abrir Seguridad de Windows",
+    "securityExclusionOK": "OK",
+    "bypassApplied": "¡Bypass aplicado!",
+    "bypassFailed": "Falló el bypass: {error}",
+    "launchFailed": "Fallo al lanzar: {error}",
+    "gameLaunched": "¡Juego lanzado!"
+  },
+  "gameDetail": {
+    "backToGames": "Volver a los juegos",
+    "loginWithRandomAccount": "Iniciar sesión con cuenta aleatoria",
+    "injectBypass": "Inyectar Bypass"
+  },
+  "updateModal": {
+    "title": "Actualización requerida",
+    "message": "Para usar Nightlight Launcher necesitas actualizar a la última versión.",
+    "yourVersion": "Tu versión:",
+    "latestVersion": "Última versión:",
+    "downloadNow": "Descargar ahora",
+    "remindLater": "Recordar más tarde"
+  },
+  "toasts": {
+    "welcomeBack": "¡Bienvenido de nuevo!",
+    "loginSuccessful": "¡Inicio de sesión exitoso!",
+    "savedKeyInvalid": "Clave guardada no válida. Obtén una nueva clave.",
+    "gameFilesFound": "✅ Esta ubicación contiene archivos del juego",
+    "gameFilesWrong": "⚠️ Esta ubicación podría ser incorrecta",
+    "folderAlreadyAssigned": "Esta carpeta ya está asignada a otro juego. Elige una carpeta diferente.",
+    "pathEmpty": "No se ha establecido una ruta del juego.",
+    "noAccountsFound": "No se encontró una cuenta que funcione después de {attempts} intentos.",
+    "languageChanged": "Idioma cambiado a {language}"
+  }
+}
